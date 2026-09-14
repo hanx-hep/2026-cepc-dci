@@ -4,7 +4,7 @@ routerMode: hash
 theme: '@ktym4a/slidev-theme-ktym4a'
 lineNumbers: true
 fonts: false
-title: DCI monitoring, ready for CEPC
+title: Monitoring for the Distributed Computing Infrastructure
 titleTemplate: '%s - Xiao Han'
 mermaid:
   theme: dark
@@ -12,13 +12,13 @@ themeConfig:
   baseColor: sky
 ---
 
-# DCI monitoring, ready for CEPC
+# Monitoring for the<br/>Distributed Computing Infrastructure
 
 #### Automated dashboards, SAM tests, DIRAC logs, and infrastructure
 
 <br>
 
-**Xiao Han** on behalf of the DCI Group · <a href="mailto:hanx@ihep.ac.cn">hanx@ihep.ac.cn</a>
+**Xiao Han** on behalf of the IHEP DCI Group · <a href="mailto:hanx@ihep.ac.cn">hanx@ihep.ac.cn</a>
 
 <br>
 
@@ -75,7 +75,7 @@ Here is the main message. CEPC data taking will run on distributed computing inf
 layout: default
 ---
 
-# One monitoring stack, three layers — experiment-agnostic
+# One stack, three layers — experiment-agnostic
 
 ```mermaid {scale: 0.42}
 flowchart LR
@@ -209,7 +209,7 @@ Today the repository holds thirty-one dashboard files under five providers. The 
 layout: default
 ---
 
-# AI accelerates the loop; humans keep the control point
+# AI accelerates the loop; humans keep control
 
 ```mermaid {scale: 0.58}
 flowchart LR
@@ -296,7 +296,7 @@ The top row gives overall availability, and by-site and by-test gauges, over a t
 layout: section
 ---
 
-# 3 · DIRAC logs: delivered, and the plan
+# 3 · DIRAC logs: delivered and planned
 
 
 <!--
