@@ -77,7 +77,7 @@ layout: default
 
 # One stack, three layers — experiment-agnostic
 
-```mermaid {scale: 0.42}
+```mermaid {scale: 0.62}
 flowchart LR
     subgraph S[DCI sources]
         H[26 Linux hosts<br/>node_exporter]
