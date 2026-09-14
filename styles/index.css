@@ -143,6 +143,14 @@
   grid-template-columns: repeat(2, 1fr);
 }
 
+.provider-grid.two-wide .provider {
+  padding: 1.3rem 0.5rem;
+}
+
+.provider-grid.two-wide .provider strong {
+  font-size: 2.6rem;
+}
+
 .provider {
   display: flex;
   align-items: baseline;

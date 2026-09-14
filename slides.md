@@ -413,19 +413,19 @@ layout: default
 
 # Next: from searchable archive to early warning
 
-<div class="two-notes compact-notes mt-2">
+<div class="two-notes mt-4">
   <div><strong>Delivered today</strong><br/>Central collection for 60+ components; three triage panels; one search box.</div>
   <div><strong>The gap</strong><br/>Logs are searched <em>after</em> a problem is noticed — the archive raises no signal.</div>
 </div>
 
-<div class="status-stack next tight cols-2 mt-2">
+<div class="status-stack next cols-2 mt-3">
   <div><mdi-arrow-right-circle-outline /><span><strong>Error-pattern detection</strong><br/>Automatic grouping of recurring errors — Grafana Sift investigations.</span></div>
   <div><mdi-arrow-right-circle-outline /><span><strong>Anomaly alerts on log rates</strong><br/>Alert when warning or error volume deviates from the component baseline.</span></div>
   <div><mdi-arrow-right-circle-outline /><span><strong>Retention and index policy</strong><br/>Explicit hot/warm retention per index, so long-term trends stay affordable.</span></div>
   <div><mdi-arrow-right-circle-outline /><span><strong>Linked metrics ↔ logs</strong><br/>Links that carry site, component, and time range from a metric spike to its logs.</span></div>
 </div>
 
-<div class="takeaway compact mt-3">
+<div class="takeaway mt-4">
 The pipeline must survive the <strong>DIRAC v9 upgrade</strong> — a compatibility requirement, not a re-build.
 </div>
 
@@ -453,7 +453,7 @@ layout: default
 
 # Adding a host is a one-line change
 
-<div class="cols mt-2">
+<div class="cols mt-10">
   <div>
 
 ## Targets are an inventory, not a config file hunt
@@ -465,7 +465,7 @@ prometheus-cmd.py list
 prometheus-cmd.py remove <hostname>
 ```
 
-<div class="takeaway compact mt-3">
+<div class="takeaway compact mt-5">
 Host and service targets are managed as a list; adding one restarts Prometheus with the new target in seconds.
 </div>
 
@@ -474,16 +474,16 @@ Host and service targets are managed as a list; adding one restarts Prometheus w
 
 ## What is being watched
 
-<div class="provider-grid two-wide mt-2">
+<div class="provider-grid two-wide mt-4">
   <div class="provider"><strong>26</strong><span>Linux hosts</span></div>
   <div class="provider"><strong>10</strong><span>probe jobs</span></div>
 </div>
 
-<div class="filter-strip mt-3">
+<div class="filter-strip mt-4">
   <span>machinery</span><span>activemq</span><span>mysql</span><span>eos</span><span>oidc</span><span>tls</span>
 </div>
 
-<div class="takeaway compact mt-3">
+<div class="takeaway compact mt-5">
 Node exporters cover CPU, memory, disk, network, and PSI pressure; service probes cover message queues, databases, storage, and certificate expiry.
 </div>
 
