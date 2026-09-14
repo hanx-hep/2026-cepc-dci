@@ -1,18 +1,21 @@
 ---
-colorSchema: light
-color: orange-light
 layout: cover
 routerMode: hash
-theme: neversink
+theme: '@ktym4a/slidev-theme-ktym4a'
 lineNumbers: true
+fonts: false
 title: DCI monitoring, ready for CEPC
 titleTemplate: '%s - Xiao Han'
+mermaid:
+  theme: dark
+themeConfig:
+  baseColor: sky
 ---
 
-<!-- transition: slide-up -->
+# DCI monitoring, ready for CEPC
 
-## DCI monitoring, ready for CEPC
 #### Automated dashboards, SAM tests, DIRAC logs, and infrastructure
+
 <br>
 
 **Xiao Han** on behalf of the DCI Group · <a href="mailto:hanx@ihep.ac.cn">hanx@ihep.ac.cn</a>
@@ -21,8 +24,8 @@ titleTemplate: '%s - Xiao Han'
 
 **CEPC Computing Preparation** · September 2026 · *IHEP, Beijing*
 
-<a href="https://dci-grafana.ihep.ac.cn/" class="ns-c-iconlink"><mdi-view-dashboard-outline /> DCI Grafana</a>
- · <a href="https://github.com/hanx-hep/28th-junocm-dci" class="ns-c-iconlink"><mdi-history /> JUNO case study</a>
+<a href="https://dci-grafana.ihep.ac.cn/"><mdi-view-dashboard-outline /> DCI Grafana</a>
+ · <a href="https://github.com/hanx-hep/28th-junocm-dci"><mdi-history /> JUNO case study</a>
 
 
 <!--
@@ -31,26 +34,19 @@ Timing: 0:30
 Good afternoon. I am Xiao Han, speaking on behalf of the DCI Group. CEPC computing will need production monitoring from its first day of data taking. We are building that monitoring now, as shared infrastructure, and we prove every piece of it on the live JUNO DCI. This talk covers four things: automated Grafana dashboards, SAM test optimization, DIRAC log monitoring and its plan, and monitoring of the infrastructure itself.
 -->
 ---
-layout: top-title
-color: orange-light
-align: c
+layout: default
 ---
 
-:: title ::
+# Monitoring as infrastructure, not per experiment
 
-# Monitoring is built as infrastructure, not per experiment
-
-:: content ::
-
-CEPC will start data taking on distributed computing infrastructure.
-The monitoring it needs is being built **now**, as shared DCI infrastructure,
+The monitoring CEPC will need on day one is being built **now**, as shared DCI infrastructure,
 and validated daily on the **JUNO DCI** — today's production testbed.
 
-<div class="takeaway mt-6">
-<strong>One stack, proven on JUNO</strong>: when CEPC comes, it inherits a running monitoring system — not a monitoring project.
+<div class="takeaway mt-3">
+<strong>One stack, proven on JUNO</strong> — CEPC inherits a running system, not a project.
 </div>
 
-<div class="three-cards mt-8">
+<div class="three-cards mt-4">
   <div class="story-card">
     <mdi-source-branch class="story-icon" />
     <h2>Reproducible</h2>
@@ -76,18 +72,12 @@ Timing: 0:55
 Here is the main message. CEPC data taking will run on distributed computing infrastructure, and monitoring must exist on day one. Our approach is to build it as DCI infrastructure now, and to validate every part on the JUNO DCI, which is in production today. Three properties matter. The system is reproducible: dashboards are JSON in Git. It is integrated: probing, metrics, and logs meet in one place. And it is transferable: a new experiment adds targets and dashboards instead of building a new system.
 -->
 ---
-layout: top-title
-color: cyan-light
-align: c
+layout: default
 ---
-
-:: title ::
 
 # One monitoring stack, three layers — experiment-agnostic
 
-:: content ::
-
-```mermaid {scale: 0.46}
+```mermaid {scale: 0.42}
 flowchart LR
     subgraph S[DCI sources]
         H[26 Linux hosts<br/>node_exporter]
@@ -121,7 +111,6 @@ This is the whole stack on one slide. On the left are the sources: twenty-six Li
 -->
 ---
 layout: section
-color: cyan-light
 ---
 
 # 1 · Dashboards as code
@@ -133,35 +122,33 @@ Timing: 0:10
 The first part is how dashboards are produced and delivered: automatically, under review.
 -->
 ---
-layout: top-title-two-cols
-color: cyan-light
-align: c-l-l
+layout: default
 ---
-
-:: title ::
 
 # Dashboard delivery is a review pipeline
 
-:: left ::
+<div class="cols mt-2">
+  <div>
 
 ## Before · instance state
 
-```mermaid {scale: 0.66}
+```mermaid {scale: 0.56}
 flowchart TD
     A[Grafana instance] --> B[Dashboard edited in UI]
     B --> C[State stored in grafana.db]
     C --> D[Manual backup when needed]
 ```
 
-<div class="takeaway compact mt-5">
+<div class="takeaway compact mt-3">
 Dashboard data lived only in the instance database — hard to review, reproduce, or transfer to a new experiment.
 </div>
 
-:: right ::
+  </div>
+  <div>
 
 ## Now · Git delivery path
 
-```mermaid {scale: 0.66}
+```mermaid {scale: 0.56}
 flowchart TD
     A[Edit in UI or agent] --> E
     E[Export JSON] --> B
@@ -170,8 +157,11 @@ flowchart TD
     C --> D[Grafana instance]
 ```
 
-<div class="takeaway compact mt-5">
+<div class="takeaway compact mt-3">
 Each dashboard is a JSON file in Git; the provider syncs it into Grafana every 30 seconds.
+</div>
+
+  </div>
 </div>
 
 
@@ -181,18 +171,12 @@ Timing: 1:00
 The left side is the old method. Dashboards were edited in the UI and stored inside the Grafana database. That worked for one instance, but changes could not be reviewed, and nothing could be transferred. The right side is the current pipeline. We edit in the UI or through an agent, export the JSON, review the diff in Git, and the provisioning provider loads the reviewed file into Grafana within thirty seconds. For CEPC this means the dashboard set is a repository that can be cloned, reviewed, and deployed — not a database to be migrated.
 -->
 ---
-layout: top-title
-color: cyan-light
-align: c
+layout: default
 ---
-
-:: title ::
 
 # 31 dashboards under version control today
 
-:: content ::
-
-<div class="provider-grid mt-4">
+<div class="provider-grid mt-3">
   <div class="provider"><strong>10</strong><span>Admin</span></div>
   <div class="provider"><strong>9</strong><span>DIRAC</span></div>
   <div class="provider"><strong>6</strong><span>TPC</span></div>
@@ -200,7 +184,7 @@ align: c
   <div class="provider"><strong>2</strong><span>Shift</span></div>
 </div>
 
-<div class="delivery-loop mt-8">
+<div class="delivery-loop mt-5">
   <div><small>CREATE</small><strong>UI or agent</strong></div>
   <mdi-arrow-right />
   <div><small>CAPTURE</small><strong>Dashboard JSON</strong></div>
@@ -210,7 +194,7 @@ align: c
   <div><small>RECONCILE</small><strong>30 s refresh</strong></div>
 </div>
 
-<div class="two-notes mt-8">
+<div class="two-notes mt-5">
   <div><strong>Five providers</strong><br/>Admin, DIRAC, TPC, User, and Shift reconstruct the whole folder layout from version-controlled JSON.</div>
   <div class="warning-note"><strong>Guard against drift</strong><br/><code>allowUiUpdates: true</code> keeps UI editing convenient; export → review → commit must remain the return path to Git.</div>
 </div>
@@ -222,18 +206,12 @@ Timing: 1:00
 Today the repository holds thirty-one dashboard files under five providers. The delivery loop has four steps: create, capture as JSON, review in Git, and reconcile in Grafana every thirty seconds. UI editing stays enabled, so the return path matters: any UI edit must be exported and committed, or the instance and the repository drift apart. This loop is the control point that CEPC dashboards will go through as well.
 -->
 ---
-layout: top-title
-color: cyan-light
-align: c
+layout: default
 ---
-
-:: title ::
 
 # AI accelerates the loop; humans keep the control point
 
-:: content ::
-
-```mermaid {scale: 0.62}
+```mermaid {scale: 0.58}
 flowchart LR
     A[Operator defines<br/>semantics and thresholds] -. request .-> B[AI agent]
     B --> F[LLM composes<br/>dashboard JSON]
@@ -244,12 +222,12 @@ flowchart LR
     B -. result .-> A
 ```
 
-<div class="two-notes mt-8">
+<div class="two-notes mt-4">
   <div><strong>What the agent repeats</strong><br/>Panel structures, queries, transformations, variables, and layouts — across many similar dashboards.</div>
   <div><strong>What the operator keeps</strong><br/>Domain meaning, grading thresholds, approval of the diff, and the decision to act.</div>
 </div>
 
-<div class="takeaway mt-8">
+<div class="takeaway mt-4">
 This is how the <strong>SAM v4</strong> availability view and the improved <strong>TPC transfer matrix</strong> were produced — agent-built JSON, human-reviewed, provisioned like any other change.
 </div>
 
@@ -261,7 +239,6 @@ The loop can also run with an AI agent inside it. The operator defines what a da
 -->
 ---
 layout: section
-color: orange-light
 ---
 
 # 2 · Turn SAM tests into monitoring
@@ -273,35 +250,36 @@ Timing: 0:10
 The second part is SAM testing. The goal is to move service availability probing inside the monitoring stack.
 -->
 ---
-layout: top-title-two-cols
-color: orange-light
-align: c-lt-lt
+layout: default
 ---
-
-:: title ::
 
 # SAM tests moved inside the monitoring stack
 
-:: left ::
+<div class="cols mt-2">
+  <div>
 
-<div class="triage-list mt-2">
+<div class="triage-list">
   <div><small>BEFORE · EXTERNAL PORTAL</small><strong>Probing lived outside DCI monitoring</strong><span>SAM results sat in an external portal — no history next to metrics, no mesh view, no link to logs.</span></div>
-  <div><small>NOW · AVAILABILITY VIEW</small><strong>Gauges, trends, and state timelines</strong><span>Overall availability, by site and by test, over a rolling 24-hour window.</span></div>
+  <div><small>NOW · AVAILABILITY VIEW</small><strong>Gauges, trends, and state timelines</strong><span>Overall availability, by site and by test, over a 24-hour window.</span></div>
   <div><small>NOW · SITE-PAIR EVIDENCE</small><strong>Full mesh and probe logs</strong><span>Source × destination success-rate matrices for WebDAV and XRootD, plus the last probe records.</span></div>
 </div>
 
-:: right ::
+  </div>
+  <div>
 
 <div class="dashboard-frame component-dashboard-frame">
   <iframe
-    src="https://dci-grafana.ihep.ac.cn/d/samtestv3/sam-test-v4?orgId=1&from=now-24h&to=now&timezone=browser&var-site=$__all&var-exclude_tests=$__all&kiosk"
+    src="https://dci-grafana.ihep.ac.cn/d/samtestv3/sam-test-v4?orgId=1&from=1788912000000&to=1788998400000&timezone=browser&var-site=$__all&var-exclude_tests=$__all&kiosk"
     scrolling="yes"
     class="component-dashboard-iframe"
   ></iframe>
 </div>
 
-<div class="text-center mt-3">
-  <a href="https://dci-grafana.ihep.ac.cn/d/samtestv3/sam-test-v4?orgId=1&from=now-24h&to=now&timezone=browser&var-site=$__all&kiosk"><mdi-open-in-new /> Open full dashboard</a>
+<div class="text-center mt-2">
+  <a href="https://dci-grafana.ihep.ac.cn/d/samtestv3/sam-test-v4?orgId=1&from=1788912000000&to=1788998400000&timezone=browser&var-site=$__all&kiosk"><mdi-open-in-new /> Open full dashboard</a>
+</div>
+
+  </div>
 </div>
 
 
@@ -312,11 +290,10 @@ SAM tests probe whether our services actually work from the outside: compute end
 
 [Demo: wait for the dashboard, then show the overview row and one mesh panel.]
 
-The top row gives overall availability, and by-site and by-test gauges, over a rolling twenty-four hours. Below are state timelines, so a flapping service is visible as a pattern. The full-mesh matrices show source-to-destination success rates for WebDAV and XRootD, and the last table holds raw probe records. Probing and monitoring now answer to each other in one place. This dashboard was iterated eighteen times through the Git loop — that speed is the point of the automation.
+The top row gives overall availability, and by-site and by-test gauges, over a twenty-four-hour window (frozen to a known-good day in this embed). Below are state timelines, so a flapping service is visible as a pattern. The full-mesh matrices show source-to-destination success rates for WebDAV and XRootD, and the last table holds raw probe records. Probing and monitoring now answer to each other in one place. This dashboard was iterated eighteen times through the Git loop — that speed is the point of the automation.
 -->
 ---
 layout: section
-color: lime-light
 ---
 
 # 3 · DIRAC logs: delivered, and the plan
@@ -328,20 +305,17 @@ Timing: 0:10
 The third part is DIRAC log monitoring: what is delivered, and what is planned next.
 -->
 ---
-layout: top-title-two-cols
-color: lime-light
-align: c-lt-lt
+layout: default
 ---
-
-:: title ::
 
 # Central logs close the context gap
 
-:: left ::
+<div class="cols mt-2">
+  <div>
 
 ## One backend line per component
 
-The JUNO DIRAC production setup runs **60+ components** on 5 servers; their logs used to rotate on **local disks only**.
+JUNO DIRAC runs **60+ components** on 5 servers; their logs used to rotate on **local disks only**.
 
 ```text
 # /opt/dirac/etc/CAS_Prod.cfg
@@ -354,15 +328,16 @@ Logging
 }
 ```
 
-<div class="takeaway compact mt-4">
-Adding <code>mqLogs</code> turns on central delivery for every service and agent, while <code>stdout</code> stays for the local console.
+<div class="takeaway compact mt-2">
+<code>mqLogs</code> turns on central delivery for every service and agent; <code>stdout</code> stays for the local console.
 </div>
 
-:: right ::
+  </div>
+  <div>
 
 ## Central log pipeline
 
-```mermaid {scale: 0.56}
+```mermaid {scale: 0.52}
 flowchart TD
     A[DIRAC services<br/>and agents] --> B[mqLogs backend]
     A --> G[stdout backend]
@@ -376,6 +351,9 @@ flowchart TD
 ActiveMQ transports, Logstash parses, Elasticsearch stores, Grafana queries — one search box across all components.
 </div>
 
+  </div>
+</div>
+
 
 <!--
 Timing: 1:00
@@ -383,24 +361,22 @@ Timing: 1:00
 Metrics tell us that something changed; logs tell us why. The JUNO DIRAC setup runs more than sixty components. With one backend line in the DIRAC configuration, every service and agent also sends its log messages to ActiveMQ. Logstash parses them and writes them into Elasticsearch, and Grafana queries that store. The change is small in configuration but large in effect: component events from all servers are searchable in one place. This pipeline is experiment-agnostic — a CEPC DIRAC would inherit it with the same configuration pattern.
 -->
 ---
-layout: top-title-two-cols
-color: lime-light
-align: c-lt-lt
+layout: default
 ---
-
-:: title ::
 
 # Component logs follow the triage sequence
 
-:: left ::
+<div class="cols mt-2">
+  <div>
 
-<div class="triage-list mt-5">
+<div class="triage-list">
   <div><small>1 · DISTRIBUTION</small><strong>Is the error mix abnormal?</strong><span>Compare information, warning, and error volume.</span></div>
   <div><small>2 · TIMELINE</small><strong>When did the change begin?</strong><span>Narrow the relevant investigation window.</span></div>
   <div><small>3 · RECORDS</small><strong>Which message is actionable?</strong><span>Inspect individual component log records.</span></div>
 </div>
 
-:: right ::
+  </div>
+  <div>
 
 <div class="dashboard-frame component-dashboard-frame">
   <iframe
@@ -410,8 +386,11 @@ align: c-lt-lt
   ></iframe>
 </div>
 
-<div class="text-center mt-3">
+<div class="text-center mt-2">
   <a href="https://dci-grafana.ihep.ac.cn/d/bfgu666p30xdsb/component-logs?orgId=1&from=now-70d&to=now-69d&timezone=browser&var-Category=$__all&var-Name=$__all&var-Level=$__all&kiosk"><mdi-open-in-new /> Open full dashboard</a>
+</div>
+
+  </div>
 </div>
 
 
@@ -425,23 +404,17 @@ This is the Component Logs dashboard on the live instance; the time range is fro
 Reading it follows three steps. First the distribution: are there more errors than usual? Then the timeline: when did that start? Then the records: which exact message is actionable? The Category, Name, and Level filters apply to all panels at once. This is the delivered part — the plan on the next slide builds on it.
 -->
 ---
-layout: top-title
-color: lime-light
-align: c
+layout: default
 ---
 
-:: title ::
-
 # Next: from searchable archive to early warning
-
-:: content ::
 
 <div class="two-notes compact-notes mt-2">
   <div><strong>Delivered today</strong><br/>Central collection for 60+ components; three triage panels; one search box.</div>
   <div><strong>The gap</strong><br/>Logs are searched <em>after</em> a problem is noticed — the archive raises no signal.</div>
 </div>
 
-<div class="status-stack next tight mt-2">
+<div class="status-stack next tight cols-2 mt-2">
   <div><mdi-arrow-right-circle-outline /><span><strong>Error-pattern detection</strong><br/>Automatic grouping of recurring errors — Grafana Sift investigations.</span></div>
   <div><mdi-arrow-right-circle-outline /><span><strong>Anomaly alerts on log rates</strong><br/>Alert when warning or error volume deviates from the component baseline.</span></div>
   <div><mdi-arrow-right-circle-outline /><span><strong>Retention and index policy</strong><br/>Explicit hot/warm retention per index, so long-term trends stay affordable.</span></div>
@@ -460,7 +433,6 @@ Here is the plan for DIRAC log monitoring. What is delivered is collection and s
 -->
 ---
 layout: section
-color: green-light
 ---
 
 # 4 · Watch the infrastructure itself
@@ -472,16 +444,13 @@ Timing: 0:10
 The last part is the monitoring system's own foundation: hosts and services.
 -->
 ---
-layout: top-title-two-cols
-color: green-light
-align: c-l-l
+layout: default
 ---
-
-:: title ::
 
 # Adding a host is a one-line change
 
-:: left ::
+<div class="cols mt-2">
+  <div>
 
 ## Targets are an inventory, not a config file hunt
 
@@ -492,25 +461,29 @@ prometheus-cmd.py list
 prometheus-cmd.py remove <hostname>
 ```
 
-<div class="takeaway compact mt-4">
+<div class="takeaway compact mt-3">
 Host and service targets are managed as a list; adding one restarts Prometheus with the new target in seconds.
 </div>
 
-:: right ::
+  </div>
+  <div>
 
 ## What is being watched
 
-<div class="provider-grid mt-3">
+<div class="provider-grid two-wide mt-2">
   <div class="provider"><strong>26</strong><span>Linux hosts</span></div>
   <div class="provider"><strong>10</strong><span>probe jobs</span></div>
 </div>
 
-<div class="filter-strip mt-4">
+<div class="filter-strip mt-3">
   <span>machinery</span><span>activemq</span><span>mysql</span><span>eos</span><span>oidc</span><span>tls</span>
 </div>
 
-<div class="takeaway compact mt-4">
+<div class="takeaway compact mt-3">
 Node exporters cover CPU, memory, disk, network, and PSI pressure; service probes cover message queues, databases, storage, and certificate expiry.
+</div>
+
+  </div>
 </div>
 
 
@@ -520,35 +493,36 @@ Timing: 1:00
 The infrastructure layer is deliberately boring. Twenty-six Linux hosts run node exporters, collected by Prometheus as the machinery job. Around ten probe jobs watch the services the DCI depends on: ActiveMQ, MySQL, EOS storage, the OIDC identity endpoints, and TLS certificate expiry. Targets are managed as an inventory with a small command-line tool: add a hostname, and Prometheus picks it up. The Machinery Monitoring dashboard — thirty-nine panels per host — is already provisioned. This is the property CEPC needs: when its cluster appears, each new host is one command, not a project.
 -->
 ---
-layout: top-title-two-cols
-color: green-light
-align: c-l-l
+layout: default
 ---
-
-:: title ::
 
 # Delivered now, with a clear next increment
 
-:: left ::
+<div class="cols mt-2">
+  <div>
 
 ## Delivered
 
-<div class="status-stack">
+<div class="status-stack tight">
   <div><mdi-check-circle-outline /><span><strong>Dashboards as code</strong><br/>31 JSON dashboards under five providers, 30 s sync</span></div>
   <div><mdi-check-circle-outline /><span><strong>SAM v4 in Grafana</strong><br/>Availability, timelines, full mesh, probe records</span></div>
   <div><mdi-check-circle-outline /><span><strong>Central DIRAC logs</strong><br/>60+ components searchable in one place</span></div>
   <div><mdi-check-circle-outline /><span><strong>Infrastructure inventory</strong><br/>26 hosts + 10 service probes, managed by CLI</span></div>
 </div>
 
-:: right ::
+  </div>
+  <div>
 
 ## Next increment
 
-<div class="status-stack next">
+<div class="status-stack next tight">
   <div><mdi-arrow-right-circle-outline /><span><strong>Actionable alerts</strong><br/>Thresholds, ownership, and response links</span></div>
   <div><mdi-arrow-right-circle-outline /><span><strong>SAM-based alerting</strong><br/>Availability alerts with owners; CEPC probe set defined early</span></div>
   <div><mdi-arrow-right-circle-outline /><span><strong>Log early warning</strong><br/>Error patterns and log-rate anomalies, as planned</span></div>
   <div><mdi-arrow-right-circle-outline /><span><strong>CEPC onboarding pack</strong><br/>Targets, dashboards, and access policy — from day one</span></div>
+</div>
+
+  </div>
 </div>
 
 
@@ -558,24 +532,18 @@ Timing: 1:00
 On the left is what runs today: thirty-one provisioned dashboards, the SAM version four view, central DIRAC logs, and the infrastructure inventory. On the right is the next increment: alerts with owners and response links; SAM-based alerting, with the CEPC probe set defined early rather than retrofitted; log early warning as planned in part three; and a CEPC onboarding pack that bundles targets, dashboards, and access policy so CEPC starts monitored.
 -->
 ---
-layout: top-title
-color: green-light
-align: c
+layout: default
 ---
-
-:: title ::
 
 # Summary
 
-:: content ::
-
-<div class="three-cards takeaway-cards mt-8">
+<div class="three-cards takeaway-cards mt-6">
   <div class="story-card"><strong>1</strong><h2>Reproducible</h2><p>Dashboards are reviewed JSON in Git — rebuilt automatically, transferred to any experiment.</p></div>
   <div class="story-card"><strong>2</strong><h2>Integrated</h2><p>SAM probes, metrics, and DIRAC logs meet in one Grafana, with AI agents reading the same evidence.</p></div>
   <div class="story-card"><strong>3</strong><h2>Ready</h2><p>Proven daily on the JUNO DCI; CEPC inherits a running system plus an onboarding pack.</p></div>
 </div>
 
-<div class="closing-line mt-12">
+<div class="closing-line mt-10">
 When CEPC data taking starts,<br/>
 monitoring should already be <strong>running</strong> — not starting.
 </div>
@@ -588,19 +556,18 @@ Three takeaways. First, the monitoring system is reproducible: dashboards are re
 -->
 ---
 layout: cover
-color: navy
 loop: true
 title: Questions
 ---
 
 
-## Thank you. Questions?
+# Thank you. Questions?
 
 **Xiao Han · IHEP, CC**<br/>
 DCI Group
 
-<a href="https://dci-grafana.ihep.ac.cn/" class="ns-c-iconlink"><mdi-view-dashboard-outline /> dci-grafana.ihep.ac.cn</a>
- · <a href="https://github.com/hanx-hep/28th-junocm-dci" class="ns-c-iconlink"><mdi-github /> JUNO case study</a>
+<a href="https://dci-grafana.ihep.ac.cn/"><mdi-view-dashboard-outline /> dci-grafana.ihep.ac.cn</a>
+ · <a href="https://github.com/hanx-hep/28th-junocm-dci"><mdi-github /> JUNO case study</a>
 
 <!--
 Timing: 0:15

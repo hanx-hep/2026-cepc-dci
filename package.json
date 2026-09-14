@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "slidev build",
+    "build": "slidev build && node scripts-strip-fonts.cjs",
     "dev": "slidev --open"
   },
   "dependencies": {
-    "@slidev/cli": "latest",
-    "slidev-theme-neversink": "^0.4.0"
+    "@iconify-json/mdi": "latest",
+    "@ktym4a/slidev-theme-ktym4a": "^0.3.2",
+    "@slidev/cli": "latest"
   }
 }
