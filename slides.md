@@ -22,7 +22,11 @@ themeConfig:
 
 <br>
 
-**CEPC Computing Preparation** · September 2026 · *IHEP, Beijing*
+<a href="https://indico.ihep.ac.cn/event/28911/" class="text-sm">The 2026 International Workshop on the High Energy Circular Electron Positron Collider</a>
+
+<br>
+
+**24 October 2026** · *IHEP, Beijing*
 
 <a href="https://dci-grafana.ihep.ac.cn/"><mdi-view-dashboard-outline /> DCI Grafana</a>
  · <a href="https://github.com/hanx-hep/28th-junocm-dci"><mdi-history /> JUNO case study</a>
