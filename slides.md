@@ -26,7 +26,7 @@ themeConfig:
 
 <br>
 
-**24 October 2026** · *IHEP, Beijing*
+**24 October 2026** · *Shanghai, China*
 
 <a href="https://dci-grafana.ihep.ac.cn/"><mdi-view-dashboard-outline /> DCI Grafana</a>
  · <a href="https://github.com/hanx-hep/28th-junocm-dci"><mdi-history /> JUNO case study</a>
