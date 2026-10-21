@@ -14,7 +14,7 @@ themeConfig:
 
 # Monitoring for the<br/>Distributed Computing Infrastructure
 
-#### Automated dashboards, SAM tests, DIRAC logs, and infrastructure
+#### Monitoring of sites, services, and DIRAC components
 
 <br>
 
@@ -35,36 +35,36 @@ themeConfig:
 <!--
 Timing: 0:30
 
-Good afternoon. I am Xiao Han, speaking on behalf of the DCI Group. CEPC computing will need production monitoring from its first day of data taking. We are building that monitoring now, as shared infrastructure, and we prove every piece of it on the live JUNO DCI. This talk covers four things: automated Grafana dashboards, SAM test optimization, DIRAC log monitoring and its plan, and monitoring of the infrastructure itself.
+Good afternoon. I am Xiao Han, speaking on behalf of the IHEP DCI Group. This report describes the monitoring components currently used in the JUNO distributed computing environment and discusses which parts may be applicable to future CEPC computing. I will cover dashboard management, SAM service tests, DIRAC component logs, and host and service monitoring.
 -->
 ---
 layout: default
 ---
 
-# Monitoring as infrastructure, not per experiment
+# Scope and reference deployment
 
-The monitoring CEPC will need on day one is being built **now**, as shared DCI infrastructure,
-and validated daily on the **JUNO DCI** — today's production testbed.
+The examples in this report come from the **JUNO distributed computing environment**.
+They provide a reference for discussing future CEPC monitoring requirements.
 
 <div class="takeaway mt-3">
-<strong>One stack, proven on JUNO</strong> — CEPC inherits a running system, not a project.
+<strong>Scope:</strong> existing monitoring components and the additional work needed for a new experiment.
 </div>
 
 <div class="three-cards mt-4">
   <div class="story-card">
     <mdi-source-branch class="story-icon" />
-    <h2>Reproducible</h2>
-    <p>Every dashboard is JSON in Git; changes are reviewed, versioned, and deployable again from scratch.</p>
+    <h2>Dashboards</h2>
+    <p>Selected Grafana dashboards are stored as JSON files and loaded through file provisioning.</p>
   </div>
   <div class="story-card">
     <mdi-layers-search class="story-icon" />
-    <h2>Integrated</h2>
-    <p>Probes, metrics, and logs meet in one Grafana — a fault is seen with its context, not in a separate portal.</p>
+    <h2>Data sources</h2>
+    <p>Service probes, host metrics, and DIRAC component logs can be inspected through Grafana.</p>
   </div>
   <div class="story-card">
     <mdi-transit-connection-variant class="story-icon" />
-    <h2>Transferable</h2>
-    <p>Onboarding an experiment means adding targets and dashboards — no new monitoring system to build.</p>
+    <h2>CEPC requirements</h2>
+    <p>Monitoring targets, service tests, access rules, and alert thresholds must be defined for CEPC.</p>
   </div>
 </div>
 
@@ -73,15 +73,15 @@ and validated daily on the **JUNO DCI** — today's production testbed.
 <!--
 Timing: 0:55
 
-Here is the main message. CEPC data taking will run on distributed computing infrastructure, and monitoring must exist on day one. Our approach is to build it as DCI infrastructure now, and to validate every part on the JUNO DCI, which is in production today. Three properties matter. The system is reproducible: dashboards are JSON in Git. It is integrated: probing, metrics, and logs meet in one place. And it is transferable: a new experiment adds targets and dashboards instead of building a new system.
+I will use the existing JUNO environment as the reference deployment. Some dashboards are stored as JSON and provisioned from Git. Grafana also displays measurements from service probes, host exporters, and DIRAC component logs. These technical components may be useful for CEPC, but the monitored sites, service tests, permissions, and thresholds will have to be defined for CEPC rather than copied from JUNO.
 -->
 ---
 layout: default
 ---
 
-# One stack, three layers — experiment-agnostic
+# Monitoring architecture
 
-```mermaid {scale: 0.62}
+```mermaid {scale: 0.52}
 flowchart LR
     subgraph S[DCI sources]
         H[26 Linux hosts<br/>node_exporter]
@@ -97,44 +97,46 @@ flowchart LR
     PR --> G
     ES --> G
 
-    G --> O[Operators · web]
-    G --> A[AI agents · MCP gateway]
+    O[Operators · web] --> G
+    A[MCP clients · gateway] --> G
 ```
 
 <div class="architecture-legend">
-  <span><strong>Collect</strong><br/>hosts, probes, logs</span>
-  <span><strong>Integrate</strong><br/>Prometheus · Elasticsearch · Grafana</span>
-  <span><strong>Act</strong><br/>humans and agents, same evidence</span>
+  <span><strong>Inputs</strong><br/>host metrics, probes, logs</span>
+  <span><strong>Storage and display</strong><br/>Prometheus · Elasticsearch · Grafana</span>
+  <span><strong>Access</strong><br/>Grafana web interface · MCP gateway</span>
 </div>
+
+<div class="text-center muted text-xs mt-2">JUNO reference deployment · host and component counts are historical examples.</div>
 
 
 <!--
 Timing: 1:05
 
-This is the whole stack on one slide. On the left are the sources: twenty-six Linux hosts export metrics, service probes check availability, and more than sixty DIRAC components produce logs. The middle is integration: Prometheus stores metrics, and logs travel through ActiveMQ and Logstash into Elasticsearch. Grafana reads both, and its dashboards come from Git. On the right are the consumers: operators through the web, and AI agents through the MCP gateway. Nothing in this picture is experiment-specific. Onboarding CEPC means adding sources and dashboards, not new layers.
+This diagram shows the monitoring paths in the JUNO reference deployment. Prometheus receives host and service metrics. DIRAC log messages are sent through ActiveMQ and Logstash to Elasticsearch. Grafana reads from both data stores. Some dashboard definitions are provided as JSON files from Git. Operators use the Grafana interface; an MCP gateway offers another controlled interface for inspection. The specific monitoring targets and permissions for CEPC remain to be defined.
 -->
 ---
 layout: section
 ---
 
-# 1 · Dashboards as code
+# 1 · Grafana dashboards
 
 
 <!--
 Timing: 0:10
 
-The first part is how dashboards are produced and delivered: automatically, under review.
+First I will describe how dashboard definitions are managed in the current deployment.
 -->
 ---
 layout: default
 ---
 
-# Dashboard delivery is a review pipeline
+# Dashboard provisioning
 
 <div class="cols mt-2">
   <div>
 
-## Before · instance state
+## Database-only dashboards
 
 ```mermaid {scale: 0.56}
 flowchart TD
@@ -144,17 +146,17 @@ flowchart TD
 ```
 
 <div class="takeaway compact mt-3">
-Dashboard data lived only in the instance database — hard to review, reproduce, or transfer to a new experiment.
+Definitions stored only in <code>grafana.db</code> have no individual change history in this Git repository.
 </div>
 
   </div>
   <div>
 
-## Now · Git delivery path
+## File provisioning
 
 ```mermaid {scale: 0.56}
 flowchart TD
-    A[Edit in UI or agent] --> E
+    A[Edit in UI or script] --> E
     E[Export JSON] --> B
     F[Edit JSON directly] --> B
     B[Git diff and review] --> C[Provisioning provider]
@@ -162,7 +164,7 @@ flowchart TD
 ```
 
 <div class="takeaway compact mt-3">
-Each dashboard is a JSON file in Git; the provider syncs it into Grafana every 30 seconds.
+Provisioned dashboards are stored as JSON files. Grafana checks the files every 30 seconds.
 </div>
 
   </div>
@@ -172,13 +174,13 @@ Each dashboard is a JSON file in Git; the provider syncs it into Grafana every 3
 <!--
 Timing: 1:00
 
-The left side is the old method. Dashboards were edited in the UI and stored inside the Grafana database. That worked for one instance, but changes could not be reviewed, and nothing could be transferred. The right side is the current pipeline. We edit in the UI or through an agent, export the JSON, review the diff in Git, and the provisioning provider loads the reviewed file into Grafana within thirty seconds. For CEPC this means the dashboard set is a repository that can be cloned, reviewed, and deployed — not a database to be migrated.
+The left side shows dashboards stored only in the Grafana database. Those definitions do not have an individual change history in this Git repository. The right side shows the file-provisioned path: export or edit a dashboard JSON file, review the changes in Git, and let Grafana load the file. The provider checks the files every thirty seconds. This describes the provisioned subset of dashboards, not necessarily every dashboard visible in the instance.
 -->
 ---
 layout: default
 ---
 
-# 31 dashboards under version control today
+# Dashboard file inventory
 
 <div class="provider-grid mt-3">
   <div class="provider"><strong>10</strong><span>Admin</span></div>
@@ -189,83 +191,83 @@ layout: default
 </div>
 
 <div class="delivery-loop mt-5">
-  <div><small>CREATE</small><strong>UI or agent</strong></div>
+  <div><small>EDIT</small><strong>UI or JSON</strong></div>
   <mdi-arrow-right />
-  <div><small>CAPTURE</small><strong>Dashboard JSON</strong></div>
+  <div><small>EXPORT</small><strong>Dashboard JSON</strong></div>
   <mdi-arrow-right />
-  <div><small>CONTROL</small><strong>Git review</strong></div>
+  <div><small>REVIEW</small><strong>Git diff</strong></div>
   <mdi-arrow-right />
-  <div><small>RECONCILE</small><strong>30 s refresh</strong></div>
+  <div><small>LOAD</small><strong>30 s check</strong></div>
 </div>
 
 <div class="two-notes mt-5">
-  <div><strong>Five providers</strong><br/>Admin, DIRAC, TPC, User, and Shift reconstruct the whole folder layout from version-controlled JSON.</div>
-  <div class="warning-note"><strong>Guard against drift</strong><br/><code>allowUiUpdates: true</code> keeps UI editing convenient; export → review → commit must remain the return path to Git.</div>
+  <div><strong>Repository inventory</strong><br/>31 JSON files in five provisioned folders: Admin, DIRAC, TPC, User, and Shift.</div>
+  <div class="warning-note"><strong>UI changes</strong><br/><code>allowUiUpdates: true</code> permits editing in Grafana; export and commit the JSON to retain those changes.</div>
 </div>
 
 
 <!--
 Timing: 1:00
 
-Today the repository holds thirty-one dashboard files under five providers. The delivery loop has four steps: create, capture as JSON, review in Git, and reconcile in Grafana every thirty seconds. UI editing stays enabled, so the return path matters: any UI edit must be exported and committed, or the instance and the repository drift apart. This loop is the control point that CEPC dashboards will go through as well.
+The repository currently contains thirty-one dashboard JSON files in five provisioned folders. These are the files counted on this slide; other dashboards can exist in Grafana. For a provisioned dashboard, we edit or export JSON, review the diff, and let Grafana load it. UI editing is permitted, but those edits must be exported and committed if they are to persist in the repository.
 -->
 ---
 layout: default
 ---
 
-# AI accelerates the loop; humans keep control
+# Dashboard development tools
 
 ```mermaid {scale: 0.58}
 flowchart LR
-    A[Operator defines<br/>semantics and thresholds] -. request .-> B[AI agent]
-    B --> F[LLM composes<br/>dashboard JSON]
+    A[Expert specifies<br/>tests and thresholds] -. request .-> B[Assistant or script]
+    B --> F[Draft<br/>dashboard JSON]
     F --> C[Git diff<br/>and review]
     C --> D[Provision to<br/>Grafana]
-    D --> E[Verify through<br/>MCP server]
+    D --> E[Inspect panels<br/>and queries]
     E -. feedback .-> B
     B -. result .-> A
 ```
 
 <div class="two-notes mt-4">
-  <div><strong>What the agent repeats</strong><br/>Panel structures, queries, transformations, variables, and layouts — across many similar dashboards.</div>
-  <div><strong>What the operator keeps</strong><br/>Domain meaning, grading thresholds, approval of the diff, and the decision to act.</div>
+  <div><strong>Suitable for scripting</strong><br/>Repeated panels, query templates, variables, and layouts for related tests.</div>
+  <div><strong>Requires expert review</strong><br/>Probe definitions, query results, units, thresholds, and the final dashboard.</div>
 </div>
 
 <div class="takeaway mt-4">
-This is how the <strong>SAM v4</strong> availability view and the improved <strong>TPC transfer matrix</strong> were produced — agent-built JSON, human-reviewed, provisioned like any other change.
+The <strong>SAM v4</strong> view and the <strong>TPC transfer matrix</strong> are examples of dashboards developed with assistance; their results still require review against the underlying data.
 </div>
 
 
 <!--
 Timing: 1:05
 
-The loop can also run with an AI agent inside it. The operator defines what a dashboard means and its thresholds. The agent composes the dashboard JSON. We review the Git diff, provision it, and the agent verifies the live result through the MCP server, which gives it controlled, read-oriented access to Grafana. If something is wrong, the feedback goes back for another iteration. The agent does the repetitive part: panels, queries, variables, layouts. The person keeps the meaning, the approval, and the action. The SAM version four dashboard you will see next was produced this way, and so was the improved TPC transfer matrix on the JUNO side.
+Templates, scripts, or an assistant can reduce the work needed to create similar panels. The important checks remain with the responsible experts: whether a probe is defined correctly, whether a query returns the intended quantity, and whether units and thresholds have operational meaning. The SAM v4 view and TPC transfer matrix are examples where assistance was used. This slide describes development practice; it does not imply that every dashboard on the Grafana server is provisioned from this repository.
 -->
 ---
 layout: section
 ---
 
-# 2 · Turn SAM tests into monitoring
+# 2 · SAM service tests
 
 
 <!--
 Timing: 0:10
 
-The second part is SAM testing. The goal is to move service availability probing inside the monitoring stack.
+The next example is the SAM service test dashboard in Grafana.
 -->
 ---
 layout: default
 ---
 
-# SAM tests moved inside the monitoring stack
+# SAM test results
 
 <div class="cols mt-2">
   <div>
 
 <div class="triage-list">
-  <div><small>BEFORE · EXTERNAL PORTAL</small><strong>Probing lived outside DCI monitoring</strong><span>SAM results sat in an external portal — no history next to metrics, no mesh view, no link to logs.</span></div>
-  <div><small>NOW · AVAILABILITY VIEW</small><strong>Gauges, trends, and state timelines</strong><span>Overall availability, by site and by test, over a 24-hour window.</span></div>
-  <div><small>NOW · SITE-PAIR EVIDENCE</small><strong>Full mesh and probe logs</strong><span>Source × destination success-rate matrices for WebDAV and XRootD, plus the last probe records.</span></div>
+  <div><small>AVAILABILITY</small><strong>Results by site and probe</strong><span>Summary values and time trends for the selected observation window.</span></div>
+  <div><small>HISTORY</small><strong>State timelines</strong><span>Changes in test results can be inspected by site, probe type, or individual test.</span></div>
+  <div><small>STORAGE TRANSFERS</small><strong>Site-pair results</strong><span>WebDAV and XRootD matrices and individual probe records support follow-up checks.</span></div>
 </div>
 
   </div>
@@ -291,36 +293,36 @@ layout: default
 <!--
 Timing: 1:15
 
-SAM tests probe whether our services actually work from the outside: compute endpoints, WebDAV, XRootD, site to site. Before this year, the results lived in an external portal, disconnected from our metrics and logs. The iframe on the right queries SAM Test version four at a fixed September 2026 time window; it is not a static image or current availability. It may load slowly, so I will give it a moment.
+SAM tests exercise compute and storage services from the point of view of a client. This Grafana dashboard presents results by site and probe type, time histories, storage site-pair matrices, and individual records. The iframe queries a fixed September 2026 window for the purpose of this presentation; it is not a measurement of current availability. It may load slowly.
 
 [Demo: wait for the dashboard, then show the overview row and one mesh panel. If Grafana requires login, open the full dashboard in a new tab and sign in. Reload the slide once; if the cross-site iframe still cannot use the session, present from the full Grafana tab. Do not assume a successful iframe load means authenticated data are available.]
 
-The top row gives overall availability, and by-site and by-test gauges, over a twenty-four-hour window (frozen to a known-good day in this embed). Below are state timelines, so a flapping service is visible as a pattern. The full-mesh matrices show source-to-destination success rates for WebDAV and XRootD, and the last table holds raw probe records. Probing and monitoring now answer to each other in one place. This dashboard was iterated eighteen times through the Git loop — that speed is the point of the automation.
+The upper panels summarize the selected time window. The timelines show when a test result changed. WebDAV and XRootD matrices organize results by source and destination site, while the record table contains the underlying probe results. A displayed percentage is meaningful only together with its time window and probe definition.
 -->
 ---
 layout: section
 ---
 
-# 3 · DIRAC logs: delivered and planned
+# 3 · DIRAC component logs
 
 
 <!--
 Timing: 0:10
 
-The third part is DIRAC log monitoring: what is delivered, and what is planned next.
+I will now show how DIRAC component logs are collected and what remains to be done.
 -->
 ---
 layout: default
 ---
 
-# Central logs close the context gap
+# DIRAC log collection
 
 <div class="cols mt-2">
   <div>
 
-## One backend line per component
+## Component configuration
 
-JUNO DIRAC runs **60+ components** on 5 servers; their logs used to rotate on **local disks only**.
+In the JUNO DIRAC setup, **60+ components** on 5 servers produce logs. The central backend is enabled alongside local output.
 
 ```text
 # /opt/dirac/etc/CAS_Prod.cfg
@@ -334,13 +336,13 @@ Logging
 ```
 
 <div class="takeaway compact mt-2">
-<code>mqLogs</code> turns on central delivery for every service and agent; <code>stdout</code> stays for the local console.
+The configuration enables <code>mqLogs</code> for services and agents while retaining <code>stdout</code>.
 </div>
 
   </div>
   <div>
 
-## Central log pipeline
+## Log transport
 
 ```mermaid {scale: 0.52}
 flowchart TD
@@ -353,7 +355,7 @@ flowchart TD
 ```
 
 <div class="takeaway compact mt-2">
-ActiveMQ transports, Logstash parses, Elasticsearch stores, Grafana queries — one search box across all components.
+ActiveMQ transports log messages; Logstash processes them; Elasticsearch stores them for queries in Grafana.
 </div>
 
   </div>
@@ -363,21 +365,21 @@ ActiveMQ transports, Logstash parses, Elasticsearch stores, Grafana queries — 
 <!--
 Timing: 1:00
 
-Metrics tell us that something changed; logs tell us why. The JUNO DIRAC setup runs more than sixty components. With one backend line in the DIRAC configuration, every service and agent also sends its log messages to ActiveMQ. Logstash parses them and writes them into Elasticsearch, and Grafana queries that store. The change is small in configuration but large in effect: component events from all servers are searchable in one place. This pipeline is experiment-agnostic — a CEPC DIRAC would inherit it with the same configuration pattern.
+The JUNO DIRAC setup runs more than sixty services and agents across five servers. In the configuration shown here, both services and agents retain stdout and additionally use the mqLogs backend. ActiveMQ receives the messages, Logstash processes them, and Elasticsearch stores them. Grafana queries this store. Whether the same configuration is suitable for a future CEPC DIRAC deployment will need to be checked against its component versions and operations model.
 -->
 ---
 layout: default
 ---
 
-# Component logs follow the triage sequence
+# Inspecting component logs
 
 <div class="cols mt-2">
   <div>
 
 <div class="triage-list">
-  <div><small>1 · DISTRIBUTION</small><strong>Is the error mix abnormal?</strong><span>Compare information, warning, and error volume.</span></div>
-  <div><small>2 · TIMELINE</small><strong>When did the change begin?</strong><span>Narrow the relevant investigation window.</span></div>
-  <div><small>3 · RECORDS</small><strong>Which message is actionable?</strong><span>Inspect individual component log records.</span></div>
+  <div><small>LOG LEVEL</small><strong>Message counts</strong><span>Compare the number of messages by severity level.</span></div>
+  <div><small>TIME</small><strong>Change in rate</strong><span>Select a period to examine a change in message frequency.</span></div>
+  <div><small>COMPONENT</small><strong>Individual messages</strong><span>Filter by category and name to inspect relevant records.</span></div>
 </div>
 
   </div>
@@ -407,58 +409,58 @@ This is the Component Logs dashboard on the live instance; its relative URL requ
 
 [Demo: wait for the dashboard, then scroll through the three panels. If Grafana requires login, open the full dashboard in a new tab and sign in. Reload the slide once; if the cross-site iframe still cannot use the session, present from the full Grafana tab.]
 
-Reading it follows three steps. First the distribution: are there more errors than usual? Then the timeline: when did that start? Then the records: which exact message is actionable? The Category, Name, and Level filters apply to all panels at once. This is the delivered part — the plan on the next slide builds on it.
+This dashboard offers three views of the same log data: counts by level, changes over time, and individual records. Filters for category, component name, and level help narrow the query. The time window in this example is relative and may need adjustment during the presentation. The next slide lists proposed improvements; they are not part of the current log collection pipeline.
 -->
 ---
 layout: default
 ---
 
-# Next: from searchable archive to early warning
+# Planned log-monitoring work
 
 <div class="two-notes mt-4">
-  <div><strong>Delivered today</strong><br/>Central collection for 60+ components; three triage panels; one search box.</div>
-  <div><strong>The gap</strong><br/>Logs are searched <em>after</em> a problem is noticed — the archive raises no signal.</div>
+  <div><strong>Available</strong><br/>Central collection and a dashboard for filtering and inspecting component records.</div>
+  <div><strong>Not yet evaluated</strong><br/>Alert criteria, log retention periods, and links from service metrics to log records.</div>
 </div>
 
 <div class="status-stack next cols-2 mt-3">
-  <div><mdi-arrow-right-circle-outline /><span><strong>Error-pattern detection</strong><br/>Automatic grouping of recurring errors — Grafana Sift investigations.</span></div>
-  <div><mdi-arrow-right-circle-outline /><span><strong>Anomaly alerts on log rates</strong><br/>Alert when warning or error volume deviates from the component baseline.</span></div>
-  <div><mdi-arrow-right-circle-outline /><span><strong>Retention and index policy</strong><br/>Explicit hot/warm retention per index, so long-term trends stay affordable.</span></div>
-  <div><mdi-arrow-right-circle-outline /><span><strong>Linked metrics ↔ logs</strong><br/>Links that carry site, component, and time range from a metric spike to its logs.</span></div>
+  <div><mdi-arrow-right-circle-outline /><span><strong>Repeated error messages</strong><br/>Evaluate grouping by component and message type.</span></div>
+  <div><mdi-arrow-right-circle-outline /><span><strong>Rate-based alerts</strong><br/>Establish baselines before setting component-specific thresholds.</span></div>
+  <div><mdi-arrow-right-circle-outline /><span><strong>Retention policy</strong><br/>Define storage periods and index lifecycle requirements.</span></div>
+  <div><mdi-arrow-right-circle-outline /><span><strong>Metrics and logs</strong><br/>Preserve component and time selections when moving between views.</span></div>
 </div>
 
 <div class="takeaway mt-4">
-The pipeline must survive the <strong>DIRAC v9 upgrade</strong> — a compatibility requirement, not a re-build.
+Check log delivery and field mappings when changing <strong>DIRAC versions</strong> or component configurations.
 </div>
 
 
 <!--
 Timing: 1:10
 
-Here is the plan for DIRAC log monitoring. What is delivered is collection and search. The gap is that logs still wait for someone to look. Four steps close it. First, error-pattern detection: automatic grouping of recurring errors, using Grafana's investigation features. Second, alerts on log rates, so an abnormal error volume pages us instead of waiting for a shift check. Third, an explicit retention policy per index. Fourth, links that carry site, component, and time range from a metric panel straight into the log view. And one constraint: the DIRAC v9 upgrade is coming, and the pipeline must survive it as a compatibility requirement, not as a rebuild.
+The current pipeline collects and stores logs and supports manual searches. Further work is needed before it can reliably drive alerts. We need to examine repeated messages, define baselines and thresholds by component, agree on retention periods, and preserve context when switching from a metric to log records. When DIRAC is upgraded or reconfigured, the log backend and parsed fields should be tested again. These are proposed tasks, not delivered functions.
 -->
 ---
 layout: section
 ---
 
-# 4 · Watch the infrastructure itself
+# 4 · Hosts and services
 
 
 <!--
 Timing: 0:10
 
-The last part is the monitoring system's own foundation: hosts and services.
+The final example concerns machine-level measurements and service checks.
 -->
 ---
 layout: default
 ---
 
-# Adding a host is a one-line change
+# Host and service monitoring
 
 <div class="cols mt-10">
   <div>
 
-## Targets are an inventory, not a config file hunt
+## Prometheus targets
 
 ```bash
 # on the monitoring server
@@ -468,17 +470,17 @@ prometheus-cmd.py remove <hostname>
 ```
 
 <div class="takeaway compact mt-5">
-Host and service targets are managed as a list; adding one restarts Prometheus with the new target in seconds.
+The target-management command updates the Prometheus configuration on the monitoring server.
 </div>
 
   </div>
   <div>
 
-## What is being watched
+## Reference deployment
 
 <div class="provider-grid two-wide mt-4">
-  <div class="provider"><strong>26</strong><span>Linux hosts</span></div>
-  <div class="provider"><strong>10</strong><span>probe jobs</span></div>
+  <div class="provider"><strong>26</strong><span>hosts*</span></div>
+  <div class="provider"><strong>10</strong><span>jobs*</span></div>
 </div>
 
 <div class="filter-strip mt-4">
@@ -486,7 +488,7 @@ Host and service targets are managed as a list; adding one restarts Prometheus w
 </div>
 
 <div class="takeaway compact mt-5">
-Node exporters cover CPU, memory, disk, network, and PSI pressure; service probes cover message queues, databases, storage, and certificate expiry.
+Host metrics include CPU, memory, disk, and network use. Other jobs check services and certificate expiry. <small>*Monitoring snapshot, September 2026.</small>
 </div>
 
   </div>
@@ -496,36 +498,36 @@ Node exporters cover CPU, memory, disk, network, and PSI pressure; service probe
 <!--
 Timing: 1:00
 
-The infrastructure layer is deliberately boring. Twenty-six Linux hosts run node exporters, collected by Prometheus as the machinery job. Around ten probe jobs watch the services the DCI depends on: ActiveMQ, MySQL, EOS storage, the OIDC identity endpoints, and TLS certificate expiry. Targets are managed as an inventory with a small command-line tool: add a hostname, and Prometheus picks it up. The Machinery Monitoring dashboard — thirty-nine panels per host — is already provisioned. This is the property CEPC needs: when its cluster appears, each new host is one command, not a project.
+The host metrics are collected by Prometheus from node exporters. The twenty-six hosts and ten job names shown here are a snapshot from September 2026, not a measurement of the current fleet. Jobs include machine metrics and checks for services such as ActiveMQ, MySQL, storage, authentication, and certificate expiry. The command-line tool on the monitoring server manages targets; it is not intended to run from this slide repository. CEPC would require its own target inventory and service coverage.
 -->
 ---
 layout: default
 ---
 
-# Delivered now, with a clear next increment
+# Status and remaining work
 
 <div class="cols mt-2">
   <div>
 
-## Delivered
+## Available in the reference setup
 
 <div class="status-stack tight">
-  <div><mdi-check-circle-outline /><span><strong>Dashboards as code</strong><br/>31 JSON dashboards under five providers, 30 s sync</span></div>
-  <div><mdi-check-circle-outline /><span><strong>SAM v4 in Grafana</strong><br/>Availability, timelines, full mesh, probe records</span></div>
-  <div><mdi-check-circle-outline /><span><strong>Central DIRAC logs</strong><br/>60+ components searchable in one place</span></div>
-  <div><mdi-check-circle-outline /><span><strong>Infrastructure inventory</strong><br/>26 hosts + 10 service probes, managed by CLI</span></div>
+  <div><mdi-check-circle-outline /><span><strong>Dashboard files</strong><br/>31 JSON files in five provisioned folders</span></div>
+  <div><mdi-check-circle-outline /><span><strong>SAM test view</strong><br/>Results by site, probe, and storage site pair</span></div>
+  <div><mdi-check-circle-outline /><span><strong>DIRAC log collection</strong><br/>Central storage and inspection in Grafana</span></div>
+  <div><mdi-check-circle-outline /><span><strong>Host metrics</strong><br/>Prometheus exporters and service checks</span></div>
 </div>
 
   </div>
   <div>
 
-## Next increment
+## To define or validate
 
 <div class="status-stack next tight">
-  <div><mdi-arrow-right-circle-outline /><span><strong>Actionable alerts</strong><br/>Thresholds, ownership, and response links</span></div>
-  <div><mdi-arrow-right-circle-outline /><span><strong>SAM-based alerting</strong><br/>Availability alerts with owners; CEPC probe set defined early</span></div>
-  <div><mdi-arrow-right-circle-outline /><span><strong>Log early warning</strong><br/>Error patterns and log-rate anomalies, as planned</span></div>
-  <div><mdi-arrow-right-circle-outline /><span><strong>CEPC onboarding pack</strong><br/>Targets, dashboards, and access policy — from day one</span></div>
+  <div><mdi-arrow-right-circle-outline /><span><strong>Alert criteria</strong><br/>Thresholds, recipients, and response procedures</span></div>
+  <div><mdi-arrow-right-circle-outline /><span><strong>Service tests</strong><br/>CEPC sites, probe definitions, and test coverage</span></div>
+  <div><mdi-arrow-right-circle-outline /><span><strong>Log monitoring</strong><br/>Baselines, retention, and DIRAC compatibility</span></div>
+  <div><mdi-arrow-right-circle-outline /><span><strong>CEPC configuration</strong><br/>Target inventory, dashboards, and access rules</span></div>
 </div>
 
   </div>
@@ -535,7 +537,7 @@ layout: default
 <!--
 Timing: 1:00
 
-On the left is what runs today: thirty-one provisioned dashboards, the SAM version four view, central DIRAC logs, and the infrastructure inventory. On the right is the next increment: alerts with owners and response links; SAM-based alerting, with the CEPC probe set defined early rather than retrofitted; log early warning as planned in part three; and a CEPC onboarding pack that bundles targets, dashboards, and access policy so CEPC starts monitored.
+The left column summarizes functions demonstrated in the JUNO reference environment. The thirty-one dashboard files are counted from the provisioning repository; the SAM dashboard is a separate example from the Grafana instance. The host and job counts on the previous slide were measured in September, so they should not be read as current capacity. The right column lists work that requires CEPC-specific definitions and validation, including tests, access rules, thresholds, and operational responsibilities.
 -->
 ---
 layout: default
@@ -544,21 +546,21 @@ layout: default
 # Summary
 
 <div class="three-cards takeaway-cards mt-6">
-  <div class="story-card"><strong>1</strong><h2>Reproducible</h2><p>Dashboards are reviewed JSON in Git — rebuilt automatically, transferred to any experiment.</p></div>
-  <div class="story-card"><strong>2</strong><h2>Integrated</h2><p>SAM probes, metrics, and DIRAC logs meet in one Grafana, with AI agents reading the same evidence.</p></div>
-  <div class="story-card"><strong>3</strong><h2>Ready</h2><p>Proven daily on the JUNO DCI; CEPC inherits a running system plus an onboarding pack.</p></div>
+  <div class="story-card"><strong>1</strong><h2>Available tools</h2><p>Grafana displays host measurements, SAM results, and DIRAC logs from the reference setup.</p></div>
+  <div class="story-card"><strong>2</strong><h2>Configuration</h2><p>Provisioned dashboard definitions are maintained as JSON files in Git.</p></div>
+  <div class="story-card"><strong>3</strong><h2>CEPC work</h2><p>Site targets, probes, alert criteria, and permissions must be specified and tested.</p></div>
 </div>
 
 <div class="closing-line mt-10">
-When CEPC data taking starts,<br/>
-monitoring should already be <strong>running</strong> — not starting.
+The JUNO deployment provides a technical reference.<br/>
+CEPC monitoring requires its own <strong>requirements and validation</strong>.
 </div>
 
 
 <!--
 Timing: 0:50
 
-Three takeaways. First, the monitoring system is reproducible: dashboards are reviewed JSON in Git. Second, it is integrated: probes, metrics, and logs meet in one Grafana, and AI agents read the same evidence through MCP. Third, it is ready: it runs in production on the JUNO DCI today, and CEPC inherits it together with an onboarding pack. The key point for CEPC: when data taking starts, monitoring should already be running, not starting.
+To summarize: Grafana can display the host, service-test, and DIRAC log information already collected in the JUNO reference environment. File provisioning makes the selected dashboard definitions easier to maintain and review. Before using this approach for CEPC, we must identify its sites and services, choose probes and thresholds, define access, and validate the monitoring chain against actual CEPC operations. This is an example architecture, not a claim that CEPC monitoring is already complete.
 -->
 ---
 layout: cover
@@ -567,7 +569,7 @@ title: Questions
 ---
 
 
-# Thank you. Questions?
+# Questions
 
 **Xiao Han · IHEP, CC**<br/>
 DCI Group
