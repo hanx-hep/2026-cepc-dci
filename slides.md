@@ -82,6 +82,7 @@ layout: default
 # Monitoring architecture
 
 ```mermaid {scale: 0.52}
+%%{init: {"themeVariables": {"fontSize": "20px"}}}%%
 flowchart LR
     subgraph S[DCI sources]
         H[26 Linux hosts<br/>node_exporter]
@@ -96,24 +97,19 @@ flowchart LR
     GIT[(Git · dashboards<br/>as JSON)] --> G[Grafana]
     PR --> G
     ES --> G
+    G --> N[Alerting<br/>Email · WeCom]
 
     O[Operators · web] --> G
     A[MCP clients · gateway] --> G
 ```
 
-<div class="architecture-legend">
-  <span><strong>Inputs</strong><br/>host metrics, probes, logs</span>
-  <span><strong>Storage and display</strong><br/>Prometheus · Elasticsearch · Grafana</span>
-  <span><strong>Access</strong><br/>Grafana web interface · MCP gateway</span>
-</div>
-
-<div class="text-center muted text-xs mt-2">JUNO reference deployment · host and component counts are historical examples.</div>
+<div class="text-center muted text-xs mt-4">JUNO reference deployment · host and component counts are historical examples.</div>
 
 
 <!--
 Timing: 1:05
 
-This diagram shows the monitoring paths in the JUNO reference deployment. Prometheus receives host and service metrics. DIRAC log messages are sent through ActiveMQ and Logstash to Elasticsearch. Grafana reads from both data stores. Some dashboard definitions are provided as JSON files from Git. Operators use the Grafana interface; an MCP gateway offers another controlled interface for inspection. The specific monitoring targets and permissions for CEPC remain to be defined.
+This diagram shows the monitoring paths in the JUNO reference deployment. Prometheus receives host and service metrics. DIRAC log messages are sent through ActiveMQ and Logstash to Elasticsearch. Grafana reads from both data stores. Some dashboard definitions are provided as JSON files from Git. Operators use the Grafana interface; an MCP gateway offers another controlled interface for inspection. Grafana also sends alert notifications by email and WeCom. Alert rules and recipient lists for CEPC would need to be defined separately.
 -->
 ---
 layout: section
