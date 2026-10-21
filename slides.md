@@ -91,25 +91,29 @@ flowchart LR
     end
 
     H --> PR[(Prometheus)]
-    P --> PR
-    L --> MQ[ActiveMQ] --> LS[Logstash] --> ES[(Elasticsearch)]
+    P --> MQ[ActiveMQ<br/>buffer] --> LS[Logstash] --> ES[(Elasticsearch)]
+    L --> ES
+    L -. buffered path .-> MQ
 
     GIT[(Git · dashboards<br/>as JSON)] --> G[Grafana]
     PR --> G
     ES --> G
+    G --> O[Operators · web]
+    G --> A[MCP gateway · clients]
     G --> N[Alerting<br/>Email · WeCom]
-
-    O[Operators · web] --> G
-    A[MCP clients · gateway] --> G
 ```
 
-<div class="text-center muted text-xs mt-4">JUNO reference deployment · host and component counts are historical examples.</div>
+<div class="architecture-note mt-4">
+Host metrics → Prometheus; service probes → ActiveMQ → Logstash → Elasticsearch; DIRAC components → Elasticsearch (with MQ buffering). Grafana provides web and MCP views and sends email / WeCom alerts.
+</div>
+
+<div class="text-center muted text-xs mt-2">JUNO reference deployment · host and component counts are historical examples.</div>
 
 
 <!--
 Timing: 1:05
 
-This diagram shows the monitoring paths in the JUNO reference deployment. Prometheus receives host and service metrics. DIRAC log messages are sent through ActiveMQ and Logstash to Elasticsearch. Grafana reads from both data stores. Some dashboard definitions are provided as JSON files from Git. Operators use the Grafana interface; an MCP gateway offers another controlled interface for inspection. Grafana also sends alert notifications by email and WeCom. Alert rules and recipient lists for CEPC would need to be defined separately.
+This diagram shows the monitoring paths in the JUNO reference deployment. Host metrics go to Prometheus. Service probe messages pass through ActiveMQ and Logstash before reaching Elasticsearch. DIRAC components write directly to Elasticsearch; ActiveMQ provides a buffered route when needed. Grafana reads the two data stores and provisioned dashboard definitions. Its outputs serve web operators, MCP clients, and email and WeCom alert notifications. Alert rules and recipient lists for CEPC would need to be defined separately.
 -->
 ---
 layout: section
@@ -338,20 +342,21 @@ The configuration enables <code>mqLogs</code> for services and agents while reta
   </div>
   <div>
 
-## Log transport
+## Direct and buffered paths
 
 ```mermaid {scale: 0.52}
 flowchart TD
-    A[DIRAC services<br/>and agents] --> B[mqLogs backend]
+    A[DIRAC services<br/>and agents] --> E[(Elasticsearch)]
+    A --> B[mqLogs backend]
     A --> G[stdout backend]
-    B --> C[ActiveMQ]
+    B --> C[ActiveMQ buffer]
     C --> D[Logstash]
-    D --> E[(Elasticsearch)]
+    D --> E
     G --> H[Local Disks]
 ```
 
 <div class="takeaway compact mt-2">
-ActiveMQ transports log messages; Logstash processes them; Elasticsearch stores them for queries in Grafana.
+Elasticsearch receives component records directly; ActiveMQ provides buffering before Logstash forwards records to Elasticsearch.
 </div>
 
   </div>
@@ -361,7 +366,7 @@ ActiveMQ transports log messages; Logstash processes them; Elasticsearch stores 
 <!--
 Timing: 1:00
 
-The JUNO DIRAC setup runs more than sixty services and agents across five servers. In the configuration shown here, both services and agents retain stdout and additionally use the mqLogs backend. ActiveMQ receives the messages, Logstash processes them, and Elasticsearch stores them. Grafana queries this store. Whether the same configuration is suitable for a future CEPC DIRAC deployment will need to be checked against its component versions and operations model.
+The JUNO DIRAC setup runs more than sixty services and agents across five servers. Component records can be written directly to Elasticsearch. The configuration on the left enables an additional mqLogs path for buffered delivery: ActiveMQ holds messages, Logstash processes them, and Elasticsearch stores the result. Stdout remains available locally. Grafana queries Elasticsearch. Compatibility with a future CEPC DIRAC deployment will need to be checked against its component versions and operations model.
 -->
 ---
 layout: default
