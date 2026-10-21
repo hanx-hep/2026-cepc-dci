@@ -371,6 +371,13 @@
   transform: scale(0.5);
 }
 
+.embed-hint {
+  margin-top: 0.15rem;
+  color: var(--ctp-subtext);
+  font-size: 0.72rem;
+  line-height: 1.2;
+}
+
 .dashboard-footer {
   display: flex;
   align-items: center;

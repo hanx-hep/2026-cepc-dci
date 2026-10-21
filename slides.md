@@ -280,7 +280,8 @@ layout: default
 </div>
 
 <div class="text-center mt-2">
-  <a href="https://dci-grafana.ihep.ac.cn/d/samtestv3/sam-test-v4?orgId=1&from=1788912000000&to=1788998400000&timezone=browser&var-site=$__all&kiosk"><mdi-open-in-new /> Open full dashboard</a>
+  <a href="https://dci-grafana.ihep.ac.cn/d/samtestv3/sam-test-v4?orgId=1&from=1788912000000&to=1788998400000&timezone=browser&var-site=$__all" target="_blank" rel="noopener noreferrer"><mdi-open-in-new /> Open full dashboard · sign in if needed</a>
+  <div class="embed-hint">If the embed asks for login, use the link above.</div>
 </div>
 
   </div>
@@ -290,9 +291,9 @@ layout: default
 <!--
 Timing: 1:15
 
-SAM tests probe whether our services actually work from the outside: compute endpoints, WebDAV, XRootD, site to site. Before this year, the results lived in an external portal, disconnected from our metrics and logs. The live dashboard on the right is SAM Test version four inside our Grafana. It may load slowly, so I will give it a moment.
+SAM tests probe whether our services actually work from the outside: compute endpoints, WebDAV, XRootD, site to site. Before this year, the results lived in an external portal, disconnected from our metrics and logs. The iframe on the right queries SAM Test version four at a fixed September 2026 time window; it is not a static image or current availability. It may load slowly, so I will give it a moment.
 
-[Demo: wait for the dashboard, then show the overview row and one mesh panel.]
+[Demo: wait for the dashboard, then show the overview row and one mesh panel. If Grafana requires login, open the full dashboard in a new tab and sign in. Reload the slide once; if the cross-site iframe still cannot use the session, present from the full Grafana tab. Do not assume a successful iframe load means authenticated data are available.]
 
 The top row gives overall availability, and by-site and by-test gauges, over a twenty-four-hour window (frozen to a known-good day in this embed). Below are state timelines, so a flapping service is visible as a pattern. The full-mesh matrices show source-to-destination success rates for WebDAV and XRootD, and the last table holds raw probe records. Probing and monitoring now answer to each other in one place. This dashboard was iterated eighteen times through the Git loop — that speed is the point of the automation.
 -->
@@ -391,7 +392,8 @@ layout: default
 </div>
 
 <div class="text-center mt-2">
-  <a href="https://dci-grafana.ihep.ac.cn/d/bfgu666p30xdsb/component-logs?orgId=1&from=now-70d&to=now-69d&timezone=browser&var-Category=$__all&var-Name=$__all&var-Level=$__all&kiosk"><mdi-open-in-new /> Open full dashboard</a>
+  <a href="https://dci-grafana.ihep.ac.cn/d/bfgu666p30xdsb/component-logs?orgId=1&from=now-70d&to=now-69d&timezone=browser&var-Category=$__all&var-Name=$__all&var-Level=$__all" target="_blank" rel="noopener noreferrer"><mdi-open-in-new /> Open full dashboard · sign in if needed</a>
+  <div class="embed-hint">If the embed asks for login, use the link above.</div>
 </div>
 
   </div>
@@ -401,9 +403,9 @@ layout: default
 <!--
 Timing: 1:10
 
-This is the Component Logs dashboard on the live instance; the time range is frozen to a past day for this talk.
+This is the Component Logs dashboard on the live instance; its relative URL requests a one-day window 69–70 days before the presentation, so data may vary by date.
 
-[Demo: wait for the dashboard, then scroll through the three panels.]
+[Demo: wait for the dashboard, then scroll through the three panels. If Grafana requires login, open the full dashboard in a new tab and sign in. Reload the slide once; if the cross-site iframe still cannot use the session, present from the full Grafana tab.]
 
 Reading it follows three steps. First the distribution: are there more errors than usual? Then the timeline: when did that start? Then the records: which exact message is actionable? The Category, Name, and Level filters apply to all panels at once. This is the delivered part — the plan on the next slide builds on it.
 -->
