@@ -48,6 +48,21 @@
   align-items: start;
 }
 
+.scope-panel {
+  min-height: 16rem;
+  padding: 1.4rem 1.5rem;
+  border: 1px solid var(--ctp-surface1);
+  border-radius: 0.8rem;
+  background: rgba(49, 50, 68, 0.72);
+  font-size: 1.05rem;
+  line-height: 1.45;
+}
+
+.scope-panel p {
+  margin: 0.8rem 0 0;
+  color: var(--ctp-subtext);
+}
+
 .mermaid {
   display: flex;
   justify-content: center;

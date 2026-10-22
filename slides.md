@@ -14,7 +14,7 @@ themeConfig:
 
 # Monitoring for the<br/>Distributed Computing Infrastructure
 
-#### Monitoring of sites, services, and DIRAC components
+#### Monitoring of sites, services, and middleware
 
 <br>
 
@@ -35,36 +35,24 @@ themeConfig:
 <!--
 Timing: 0:30
 
-Good afternoon. I am Xiao Han, speaking on behalf of the IHEP DCI Group. This report describes the monitoring components currently used in the JUNO distributed computing environment and discusses which parts may be applicable to future CEPC computing. I will cover dashboard management, SAM service tests, DIRAC component logs, and host and service monitoring.
+Good afternoon. I am Xiao Han, speaking on behalf of the IHEP DCI Group. This report describes the IHEP monitoring system used for JUNO, HERD, and shared distributed-computing infrastructure, and discusses which parts may be applicable to future CEPC computing. I will cover dashboard management, SAM service tests, DIRAC component logs as an example of middleware monitoring, and host and service metrics.
 -->
 ---
 layout: default
 ---
 
-# Scope and reference deployment
+# Motivation and current use
 
-The examples in this report come from the **JUNO distributed computing environment**.
-They provide a reference for discussing future CEPC monitoring requirements.
-
-<div class="takeaway mt-3">
-<strong>Scope:</strong> existing monitoring components and the additional work needed for a new experiment.
-</div>
-
-<div class="three-cards mt-4">
-  <div class="story-card">
-    <mdi-source-branch class="story-icon" />
-    <h2>Dashboards</h2>
-    <p>Selected Grafana dashboards are stored as JSON files and loaded through file provisioning.</p>
+<div class="cols mt-8">
+  <div class="scope-panel">
+    <h2>Why monitoring matters</h2>
+    <p>Modern large-scale high-energy physics experiments rely on distributed computing for data transfer, storage, and processing across sites.</p>
+    <p>CEPC will also require DCI. Monitoring is needed to assess the availability and performance of computing sites, services, and data-transfer paths.</p>
   </div>
-  <div class="story-card">
-    <mdi-layers-search class="story-icon" />
-    <h2>Data sources</h2>
-    <p>Service probes, host metrics, and DIRAC component logs can be inspected through Grafana.</p>
-  </div>
-  <div class="story-card">
-    <mdi-transit-connection-variant class="story-icon" />
-    <h2>CEPC requirements</h2>
-    <p>Monitoring targets, service tests, access rules, and alert thresholds must be defined for CEPC.</p>
+  <div class="scope-panel">
+    <h2>IHEP DCI monitoring today</h2>
+    <p>The IHEP DCI monitoring system already supports <strong>JUNO</strong> and <strong>HERD</strong>.</p>
+    <p>It also covers shared distributed-computing infrastructure, including hosts, middleware services, and service probes.</p>
   </div>
 </div>
 
@@ -73,7 +61,7 @@ They provide a reference for discussing future CEPC monitoring requirements.
 <!--
 Timing: 0:55
 
-I will use the existing JUNO environment as the reference deployment. Some dashboards are stored as JSON and provisioned from Git. Grafana also displays measurements from service probes, host exporters, and DIRAC component logs. These technical components may be useful for CEPC, but the monitored sites, service tests, permissions, and thresholds will have to be defined for CEPC rather than copied from JUNO.
+Distributed computing infrastructure is part of how modern large-scale high-energy physics experiments move, store, and process data at multiple sites. CEPC will need this infrastructure, so monitoring the state of its sites, services, and data-transfer paths will matter. At IHEP, the current monitoring system supports JUNO and HERD and also covers shared computing infrastructure. The following technical examples come largely from the existing deployment; CEPC-specific sites, tests, access rules, and alert thresholds still need to be specified.
 -->
 ---
 layout: default
@@ -87,7 +75,7 @@ flowchart LR
     subgraph S[DCI sources]
         H[26 Linux hosts<br/>node_exporter]
         P[Service probes<br/>SAM · MQ · MySQL · TLS]
-        L[DIRAC components<br/>60+ services and agents]
+        L[Middleware services<br/>DIRAC · FTS3 · others]
     end
 
     H --> PR[(Prometheus)]
@@ -104,16 +92,16 @@ flowchart LR
 ```
 
 <div class="architecture-note mt-4">
-Host metrics → Prometheus; service probes → ActiveMQ → Logstash → Elasticsearch; DIRAC components → Elasticsearch (with MQ buffering). Grafana provides web and MCP views and sends email / WeCom alerts.
+The existing IHEP DCI monitoring system supports JUNO and HERD and also monitors shared distributed-computing infrastructure.
 </div>
 
-<div class="text-center muted text-xs mt-2">JUNO reference deployment · host and component counts are historical examples.</div>
+<div class="text-center muted text-xs mt-2">Architecture shown schematically; the host count is a historical example.</div>
 
 
 <!--
 Timing: 1:05
 
-This diagram shows the monitoring paths in the JUNO reference deployment. Host metrics go to Prometheus. Service probe messages pass through ActiveMQ and Logstash before reaching Elasticsearch. DIRAC components write directly to Elasticsearch; ActiveMQ provides a buffered route when needed. Grafana reads the two data stores and provisioned dashboard definitions. Its outputs serve web operators, MCP clients, and email and WeCom alert notifications. Alert rules and recipient lists for CEPC would need to be defined separately.
+This schematic describes the existing IHEP DCI monitoring system, which supports JUNO and HERD as well as shared computing infrastructure. The middleware sources include DIRAC, FTS3, and other services; the arrows illustrate monitoring paths rather than claiming every middleware component uses an identical configuration. Host metrics go to Prometheus. Service probe messages pass through ActiveMQ and Logstash before reaching Elasticsearch. For DIRAC components, Elasticsearch can receive records directly, with ActiveMQ providing a buffered route. Grafana displays data to web operators and MCP clients and sends email and WeCom alerts. CEPC-specific alert rules and recipient lists would need to be defined separately.
 -->
 ---
 layout: section
