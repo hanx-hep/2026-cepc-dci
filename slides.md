@@ -12,6 +12,8 @@ themeConfig:
   baseColor: sky
 ---
 
+<a href="https://english.ihep.cas.cn/" class="cover-ihep-logo" target="_blank" rel="noopener noreferrer" aria-label="Institute of High Energy Physics website"><img src="/images/ihep-logo.jpg" alt="Institute of High Energy Physics, Chinese Academy of Sciences" /></a>
+
 # Monitoring for the<br/>Distributed Computing Infrastructure
 
 #### Monitoring of sites, services, and middleware
@@ -57,11 +59,11 @@ layout: default
       <a href="https://english.ihep.cas.cn/nw/han/y15/201501/t20150123_296525.html" target="_blank" rel="noopener noreferrer" aria-label="JUNO logo, JUNO Collaboration via IHEP">
         <img src="/images/juno-logo.jpg" alt="JUNO Collaboration logo" />
       </a>
-      <a href="https://herd.ihep.ac.cn/" target="_blank" rel="noopener noreferrer" aria-label="HERD logo, IHEP HERD Team">
+      <a href="https://herd-iam.ihep.ac.cn/" target="_blank" rel="noopener noreferrer" aria-label="HERD logo, HERD IAM">
         <img src="/images/herd-logo.png" alt="HERD experiment logo" />
       </a>
     </div>
-    <div class="logo-credit">Logos: <a href="https://english.ihep.cas.cn/nw/han/y15/201501/t20150123_296525.html" target="_blank" rel="noopener noreferrer">JUNO Collaboration</a> · <a href="https://herd.ihep.ac.cn/" target="_blank" rel="noopener noreferrer">IHEP HERD Team</a></div>
+    <div class="logo-credit">Logos: <a href="https://english.ihep.cas.cn/nw/han/y15/201501/t20150123_296525.html" target="_blank" rel="noopener noreferrer">JUNO Collaboration</a> · <a href="https://herd-iam.ihep.ac.cn/resources/images/logos/herd-logo.png" target="_blank" rel="noopener noreferrer">HERD IAM</a></div>
   </div>
 </div>
 

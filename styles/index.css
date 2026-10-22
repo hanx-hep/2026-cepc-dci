@@ -23,6 +23,25 @@
   line-height: 1.2 !important;
 }
 
+.slidev-layout.cover {
+  position: relative;
+}
+
+.cover-ihep-logo {
+  position: absolute;
+  top: 1.1rem;
+  right: 1.1rem;
+  width: 13rem;
+  padding: 0.3rem;
+  border-radius: 0.3rem;
+  background: #fff;
+}
+
+.cover-ihep-logo img {
+  display: block;
+  width: 100%;
+}
+
 .slidev-layout.section h1 {
   font-size: 2.8rem !important;
   line-height: 1.2 !important;
@@ -66,6 +85,7 @@
 .experiment-logos {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.7rem;
   margin-top: 1rem;
 }
@@ -78,15 +98,7 @@
   padding: 0.5rem;
   border-radius: 0.5rem;
   background: #fff;
-}
-
-.experiment-logos a:first-child {
-  flex: 0 0 6.8rem;
-}
-
-.experiment-logos a:last-child {
-  flex: 1 1 auto;
-  min-width: 0;
+  flex: 0 0 9rem;
 }
 
 .experiment-logos img {
