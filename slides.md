@@ -53,6 +53,15 @@ layout: default
     <h2>IHEP DCI monitoring today</h2>
     <p>The IHEP DCI monitoring system already supports <strong>JUNO</strong> and <strong>HERD</strong>.</p>
     <p>It also covers shared distributed-computing infrastructure, including hosts, middleware services, and service probes.</p>
+    <div class="experiment-logos">
+      <a href="https://english.ihep.cas.cn/nw/han/y15/201501/t20150123_296525.html" target="_blank" rel="noopener noreferrer" aria-label="JUNO logo, JUNO Collaboration via IHEP">
+        <img src="/images/juno-logo.jpg" alt="JUNO Collaboration logo" />
+      </a>
+      <a href="https://herd.ihep.ac.cn/" target="_blank" rel="noopener noreferrer" aria-label="HERD logo, IHEP HERD Team">
+        <img src="/images/herd-logo.png" alt="HERD experiment logo" />
+      </a>
+    </div>
+    <div class="logo-credit">Logos: <a href="https://english.ihep.cas.cn/nw/han/y15/201501/t20150123_296525.html" target="_blank" rel="noopener noreferrer">JUNO Collaboration</a> · <a href="https://herd.ihep.ac.cn/" target="_blank" rel="noopener noreferrer">IHEP HERD Team</a></div>
   </div>
 </div>
 
