@@ -13,7 +13,8 @@ themeConfig:
   baseColor: sky
 ---
 
-<a href="https://english.ihep.cas.cn/" class="cover-ihep-logo" target="_blank" rel="noopener noreferrer" aria-label="Institute of High Energy Physics website"><img src="/images/ihep-logo.jpg" alt="Institute of High Energy Physics, Chinese Academy of Sciences" /></a>
+<a href="http://cepc.ihep.ac.cn/" class="cover-brand cover-cepc-logo" target="_blank" rel="noopener noreferrer" aria-label="CEPC website"><img src="/images/cepc-logo-transparent.png" alt="CEPC" /></a>
+<a href="https://english.ihep.cas.cn/" class="cover-brand cover-ihep-logo" target="_blank" rel="noopener noreferrer" aria-label="Institute of High Energy Physics website"><img src="/images/ihep-symbol-transparent.png" alt="IHEP symbol" /></a>
 
 # Monitoring for the<br/>Distributed Computing Infrastructure
 
