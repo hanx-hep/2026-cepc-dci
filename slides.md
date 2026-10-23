@@ -148,7 +148,6 @@ layout: default
   </div>
   <div class="grafana-demo">
     <video :src="'./grafana-demo-trimmed.mp4'" autoplay loop muted playsinline controls preload="metadata" aria-label="Grafana interface screen recording"></video>
-    <div class="grafana-demo-caption"><mdi-monitor-screenshot /> Grafana interface · 1.5× · no audio</div>
   </div>
 </div>
 
