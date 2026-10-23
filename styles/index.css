@@ -114,6 +114,15 @@
   font-size: 0.7rem;
 }
 
+.slidev-layout img.cepc-inline {
+  display: inline-block;
+  width: auto;
+  height: 1em;
+  max-width: none;
+  margin: 0;
+  vertical-align: -0.12em;
+}
+
 .grafana-intro {
   display: grid;
   grid-template-columns: 1.15fr 0.85fr;

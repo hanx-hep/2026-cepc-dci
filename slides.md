@@ -50,7 +50,7 @@ layout: default
   <div class="scope-panel">
     <h2>Why monitoring matters</h2>
     <p>Modern large-scale high-energy physics experiments rely on distributed computing for data transfer, storage, and processing across sites.</p>
-    <p>CEPC will also require DCI. Monitoring is needed to assess the availability and performance of computing sites, services, and data-transfer paths.</p>
+    <p><img class="cepc-inline" src="/images/cepc-logo-transparent.png" alt="CEPC" /> will also require DCI. Monitoring is needed to assess the availability and performance of computing sites, services, and data-transfer paths.</p>
   </div>
   <div class="scope-panel">
     <h2>IHEP DCI monitoring today</h2>
@@ -233,7 +233,7 @@ flowchart LR
   <div><strong>Response</strong><br/>Route the notification to its operators; the alert is a signal for investigation, not a diagnosis.</div>
 </div>
 
-<div class="takeaway compact mt-3">Existing delivery channels: <strong>email and WeCom</strong>. CEPC-specific thresholds, recipients, and response procedures still need to be defined.</div>
+<div class="takeaway compact mt-3">Existing delivery channels: <strong>email and WeCom</strong>. <img class="cepc-inline" src="/images/cepc-logo-transparent.png" alt="CEPC" />-specific thresholds, recipients, and response procedures still need to be defined.</div>
 
 <!--
 Timing: 0:55
@@ -499,7 +499,7 @@ Monitoring data are useful when they can be related to configurations, logs, and
 layout: default
 ---
 
-# Status and CEPC work
+# Status and <img class="cepc-inline" src="/images/cepc-logo-transparent.png" alt="CEPC" /> work
 
 <div class="cols mt-2">
   <div>
@@ -516,11 +516,11 @@ layout: default
   </div>
   <div>
 
-## Needed for CEPC
+## Needed for <img class="cepc-inline" src="/images/cepc-logo-transparent.png" alt="CEPC" />
 
 <div class="status-stack next tight">
   <div><mdi-arrow-right-circle-outline /><span><strong>Site and service inventory</strong><br/>List endpoints, owners, and dashboard access</span></div>
-  <div><mdi-arrow-right-circle-outline /><span><strong>Probe coverage</strong><br/>Define CEPC site pairs, transfer protocols, and test cadence</span></div>
+  <div><mdi-arrow-right-circle-outline /><span><strong>Probe coverage</strong><br/>Define <img class="cepc-inline" src="/images/cepc-logo-transparent.png" alt="CEPC" /> site pairs, transfer protocols, and test cadence</span></div>
   <div><mdi-arrow-right-circle-outline /><span><strong>Operational alerts</strong><br/>Set thresholds, recipients, and response procedures</span></div>
   <div><mdi-arrow-right-circle-outline /><span><strong>Log policy</strong><br/>Check middleware ingestion, retention, and field mappings</span></div>
 </div>
@@ -543,12 +543,12 @@ layout: default
 <div class="three-cards takeaway-cards mt-6">
   <div class="story-card"><strong>1</strong><h2>Measure paths</h2><p>Host health alone is insufficient; site-pair probes reveal transfer failures and network asymmetry.</p></div>
   <div class="story-card"><strong>2</strong><h2>Relate evidence</h2><p>Metrics, probes, and middleware logs can be inspected together; dci-agent helps connect them during diagnosis.</p></div>
-  <div class="story-card"><strong>3</strong><h2>Adapt to CEPC</h2><p>Reuse the monitoring methods, but specify CEPC targets, thresholds, ownership, and access before deployment.</p></div>
+  <div class="story-card"><strong>3</strong><h2>Adapt to <img class="cepc-inline" src="/images/cepc-logo-transparent.png" alt="CEPC" /></h2><p>Reuse the monitoring methods, but specify <img class="cepc-inline" src="/images/cepc-logo-transparent.png" alt="CEPC" /> targets, thresholds, ownership, and access before deployment.</p></div>
 </div>
 
 <div class="closing-line mt-10">
 IHEP DCI provides a working reference.<br/>
-CEPC monitoring needs <strong>experiment-specific tests and operational ownership</strong>.
+<img class="cepc-inline" src="/images/cepc-logo-transparent.png" alt="CEPC" /> monitoring needs <strong>experiment-specific tests and operational ownership</strong>.
 </div>
 
 
