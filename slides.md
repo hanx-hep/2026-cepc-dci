@@ -90,7 +90,8 @@ flowchart LR
         FL[FTS and other logs]
         H[Host metrics]
         N[Network · storage<br/>other infrastructure]
-        P[SAM · TPC<br/>TLS · OIDC]
+        P[SAM · TPC tests]
+        Q[TLS · OIDC checks]
     end
     subgraph T[Collection and processing]
         MQ[ActiveMQ<br/>shared buffer]
@@ -102,7 +103,6 @@ flowchart LR
         ES[(Elasticsearch)]
         PR[(Prometheus)]
         DB[(Other databases)]
-        PD[(Probe-result stores)]
     end
     D -->|direct| ES
     D -. buffer on ES failure .-> MQ
@@ -110,16 +110,16 @@ flowchart LR
     F --> MQ
     DL --> MQ
     MQ -->|FTS monitoring| MP --> ES
-    MQ -->|DIRAC logs| LS --> ES
+    MQ -->|DIRAC logs / SAM / TPC| LS --> ES
+    P --> MQ
     FL --> FB --> ES
     H --> PR
     N --> DB
-    P --> PD
+    Q --> PR
     ES --> G[Grafana]
     PR --> G
     DB --> G
-    PD --> G
-    J[Git · dashboard JSON] --> G
+    G -. provisioned from .-> J[Git · dashboard JSON]
     G --> O[Operators · web]
     G --> C[MCP gateway · clients]
     G --> A[Alerting<br/>Email · WeCom]
@@ -135,7 +135,7 @@ The existing IHEP DCI monitoring system supports JUNO and HERD and also monitors
 <!--
 Timing: 1:05
 
-There are two different kinds of middleware output, but one shared ActiveMQ and one shared Elasticsearch. DIRAC monitoring writes directly to Elasticsearch. If that path stalls, DIRAC temporarily stores data in ActiveMQ. After recovery, DIRAC monitoring itself reads those buffered data and writes them along the original DIRAC-to-Elasticsearch path; there is no direct buffered-delivery path from ActiveMQ to Elasticsearch. FTS monitoring data follow ActiveMQ, monpipe, and Elasticsearch. Monpipe is a DCI Group service for transporting monitoring data. Service logs have a separate processing path: DIRAC logs go through the shared ActiveMQ and Logstash to Elasticsearch, while FTS and other middleware logs use Filebeat. Grafana also queries Prometheus and databases for network, storage, other infrastructure, and active probe results. Its outputs serve web operators, MCP clients, and email and WeCom alerts. The system supports JUNO, HERD, and shared IHEP DCI infrastructure.
+There are two different kinds of middleware output, but one shared ActiveMQ and one shared Elasticsearch. DIRAC monitoring writes directly to Elasticsearch. If that path stalls, DIRAC temporarily stores data in ActiveMQ. After recovery, DIRAC monitoring itself reads those buffered data and writes them along the original DIRAC-to-Elasticsearch path; there is no direct buffered-delivery path from ActiveMQ to Elasticsearch. FTS monitoring data follow ActiveMQ, monpipe, and Elasticsearch. Monpipe is a DCI Group service for transporting monitoring data. DIRAC logs and SAM/TPC test results go through ActiveMQ and Logstash to Elasticsearch, while FTS and other middleware logs use Filebeat. TLS and OIDC checks use Prometheus, as do host metrics. Grafana also queries databases for network, storage, and other infrastructure; there is no separate probe-result database. The Git node on the right denotes configuration provenance, not a monitoring-data output. Grafana's outputs serve web operators, MCP clients, and email and WeCom alerts. The system supports JUNO, HERD, and shared IHEP DCI infrastructure.
 -->
 ---
 layout: section
