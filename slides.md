@@ -37,7 +37,7 @@ themeConfig:
 <!--
 Timing: 0:30
 
-Good afternoon. I am Xiao Han, speaking on behalf of the IHEP DCI Group. This report describes the IHEP monitoring system used for JUNO, HERD, and shared distributed-computing infrastructure, and discusses which parts may be applicable to future CEPC computing. I will cover Grafana access and dashboards, active service probes, centralized middleware logs, and host and service metrics.
+Good afternoon. I am Xiao Han, speaking on behalf of the IHEP DCI Group. This report describes the IHEP monitoring system used for JUNO, HERD, and shared distributed-computing infrastructure, and discusses which parts may be applicable to future CEPC computing. I will cover Grafana access and dashboards, active service probes, centralized middleware logs, host metrics, and how dci-agent helps operators inspect this evidence.
 -->
 ---
 layout: default
@@ -91,7 +91,7 @@ flowchart LR
 
     H --> PR[(Prometheus)]
     P --> MQ[ActiveMQ<br/>buffer] --> LS[Logstash] --> ES[(Elasticsearch)]
-    L -->|DIRAC built-in| ES
+    L -->|DIRAC built-in mqLogs| MQ
     L -->|other middleware| FB[Filebeat] --> ES
 
     GIT[(Git · dashboards<br/>as JSON)] --> G[Grafana]
@@ -112,7 +112,7 @@ The existing IHEP DCI monitoring system supports JUNO and HERD and also monitors
 <!--
 Timing: 1:05
 
-This schematic describes the existing IHEP DCI monitoring system, which supports JUNO and HERD as well as shared computing infrastructure. Host metrics go to Prometheus. Active probe results, including SAM, TPC, certificate, and OIDC checks, can pass through ActiveMQ and Logstash to Elasticsearch. DIRAC has a built-in way to write logs to Elasticsearch; other middleware, such as FTS3, may use Filebeat to ship log files. These are alternative ingestion patterns, not a claim that every component uses both. Grafana displays data to web operators and MCP clients and sends email and WeCom alerts. CEPC-specific alert rules and recipient lists would need to be defined separately.
+This schematic describes the existing IHEP DCI monitoring system, which supports JUNO and HERD as well as shared computing infrastructure. Host metrics go to Prometheus. Active probe results, including SAM, TPC, certificate, and OIDC checks, can pass through ActiveMQ and Logstash to Elasticsearch. DIRAC's built-in mqLogs backend also sends records through ActiveMQ and Logstash before Elasticsearch. Other middleware, such as FTS3, may use Filebeat to ship local log files. Grafana displays data to web operators and MCP clients and sends email and WeCom alerts. CEPC-specific alert rules and recipient lists would need to be defined separately.
 -->
 ---
 layout: section
@@ -159,62 +159,31 @@ Grafana is the common web interface for IHEP DCI monitoring. We use multiple org
 layout: default
 ---
 
-# Dashboard JSON and provisioning
+# Dashboard JSON workflow
 
-<div class="json-workflow mt-4">
-  <div><small>DESIGN</small><strong>Operator defines<br/>panels and queries</strong></div>
-  <mdi-arrow-right />
-  <div><small>ASSIST</small><strong>Scripts or AI draft<br/>dashboard JSON</strong></div>
-  <mdi-arrow-right />
-  <div><small>REVIEW</small><strong>Check data and<br/>commit JSON to Git</strong></div>
-  <mdi-arrow-right />
-  <div><small>LOAD</small><strong>File provisioning<br/>into Grafana</strong></div>
-</div>
-
-<div class="json-details mt-5">
-  <div><strong>31 dashboard files</strong><br/>Admin 10 · DIRAC 9 · TPC 6 · User 4 · Shift 2</div>
-  <div><strong>30-second file check</strong><br/>Grafana loads the reviewed JSON; an unexported UI edit may be overwritten by the file.</div>
-  <div><strong>Human validation</strong><br/>AI can draft repeated panels, but experts check queries, units, thresholds, and actual results.</div>
-</div>
-
-<div class="takeaway compact mt-4">File provisioning covers this repository’s dashboard files; it does not imply that every dashboard in the Grafana instance is in Git.</div>
-
-
-<!--
-Timing: 1:00
-
-Dashboard definitions can be exported from the Grafana UI or drafted as JSON with scripts and AI assistance. Experts review queries, units, thresholds, and panels against real data before committing the file. The repository currently contains thirty-one JSON dashboards in five folders. Grafana checks provisioned files every thirty seconds. UI editing is allowed, but a provisioned dashboard's edits must be exported and committed to survive the next file update. Dashboards that are stored only in the instance database are outside this particular Git inventory.
--->
----
-layout: default
----
-
-# Dashboard development tools
-
-```mermaid {scale: 0.62}
+```mermaid {scale: 0.64}
 %%{init: {"themeVariables": {"fontSize": "28px"}}}%%
 flowchart LR
-    A[Expert defines<br/>tests and units] --> B[AI or script<br/>drafts JSON]
-    B --> C[Review<br/>queries and diff]
+    A[Expert defines<br/>panels and queries] --> B[AI or script<br/>drafts JSON]
+    B --> C[Review JSON<br/>and Git diff]
     C --> D[Provision<br/>in Grafana]
-    D --> E[Inspect<br/>panels and data]
+    D --> E[Inspect<br/>real data]
     E -. revise .-> B
 ```
 
-<div class="two-notes mt-4">
-  <div><strong>Suitable for scripting</strong><br/>Repeated panels, query templates, variables, and layouts for related tests.</div>
-  <div><strong>Requires expert review</strong><br/>Probe definitions, query results, units, thresholds, and the final dashboard.</div>
+<div class="json-details mt-6">
+  <div><strong>31 JSON files in Git</strong><br/>Admin 10 · DIRAC 9 · TPC 6 · User 4 · Shift 2</div>
+  <div><strong>30-second file check</strong><br/>Grafana loads the files; unexported UI edits to provisioned dashboards can be overwritten.</div>
+  <div><strong>Human validation</strong><br/>AI helps with repeated panels. Experts check queries, units, thresholds, and results.</div>
 </div>
 
-<div class="takeaway mt-4">
-The <strong>SAM v4</strong> view and the <strong>TPC transfer matrix</strong> are examples of dashboards developed with assistance; their results still require review against the underlying data.
-</div>
+<div class="takeaway compact mt-5">The <strong>SAM v4</strong> and <strong>TPC transfer matrix</strong> views illustrate assisted development. File provisioning covers the repository’s dashboards, not every dashboard in the instance.</div>
 
 
 <!--
-Timing: 1:05
+Timing: 1:25
 
-Templates, scripts, or an assistant can reduce the work needed to create similar panels. The important checks remain with the responsible experts: whether a probe is defined correctly, whether a query returns the intended quantity, and whether units and thresholds have operational meaning. The SAM v4 view and TPC transfer matrix are examples where assistance was used. This slide describes development practice; it does not imply that every dashboard on the Grafana server is provisioned from this repository.
+Dashboard definitions can be exported from the Grafana UI or drafted as JSON with scripts and AI assistance. Experts check queries, units, thresholds, and panels against actual data before committing. The repository currently has thirty-one JSON files in five folders; Grafana checks provisioned files every thirty seconds. UI edits must be exported and committed to persist for a provisioned dashboard. SAM v4 and the TPC transfer matrix are examples of assisted development. This inventory does not include dashboards stored only in the instance database.
 -->
 ---
 layout: default
@@ -345,26 +314,25 @@ layout: default
 ## Collection methods
 
 <div class="triage-list mt-4">
-  <div><small>DIRAC</small><strong>Built-in Elasticsearch output</strong><span>DIRAC services and agents can write structured records to ES without tailing local files.</span></div>
+  <div><small>DIRAC</small><strong>Built-in mqLogs backend</strong><span>DIRAC services and agents send logs through ActiveMQ and Logstash into Elasticsearch.</span></div>
   <div><small>OTHER MIDDLEWARE</small><strong>Filebeat when needed</strong><span>A log shipper can read local log files from components such as FTS3 and forward them for central indexing.</span></div>
 </div>
+
+<div class="takeaway compact mt-3">Common fields such as time, component, and severity support cross-service searches.</div>
 
   </div>
   <div>
 
 ## Storage and inspection
 
-```mermaid {scale: 0.56}
+```mermaid {scale: 0.53}
 %%{init: {"themeVariables": {"fontSize": "20px"}}}%%
-flowchart LR
-    A[DIRAC components] -->|built-in| E[(Elasticsearch)]
+flowchart TB
+    A[DIRAC components] -->|built-in mqLogs| MQ[ActiveMQ]
+    MQ --> LS[Logstash] --> E[(Elasticsearch)]
     B[Other middleware<br/>log files] --> C[Filebeat] --> E
     E --> D[Grafana<br/>log views]
 ```
-
-<div class="takeaway compact mt-2">
-Common fields such as time, component, and severity make records from different services easier to search together.
-</div>
 
   </div>
 </div>
@@ -373,7 +341,7 @@ Common fields such as time, component, and severity make records from different 
 <!--
 Timing: 1:00
 
-The JUNO DIRAC setup includes more than sixty services and agents across five servers. DIRAC has a built-in way to send logs directly to Elasticsearch. For other middleware, a shipper such as Filebeat can collect local log files instead; this is an available collection pattern, not a claim that all components already use Filebeat. Elasticsearch is the shared store, and Grafana provides the inspection interface. Field mappings and delivery should be validated per component and again when a middleware version changes.
+The JUNO DIRAC setup includes more than sixty services and agents across five servers. DIRAC's built-in mqLogs backend sends records to ActiveMQ, which buffers them before Logstash processes them into Elasticsearch. For other middleware, a shipper such as Filebeat can collect local log files instead; this is an available collection pattern, not a claim that all components already use Filebeat. Elasticsearch is the shared store, and Grafana provides the inspection interface. Field mappings and delivery should be validated per component and again when a middleware version changes.
 -->
 ---
 layout: default
@@ -455,7 +423,7 @@ layout: section
 <!--
 Timing: 0:10
 
-The final example concerns machine-level measurements and service checks.
+The last monitoring source is machine-level measurements and service checks; then I will briefly show how dci-agent uses the evidence.
 -->
 ---
 layout: default
@@ -510,30 +478,56 @@ The host metrics are collected by Prometheus from node exporters. The twenty-six
 layout: default
 ---
 
-# Status and remaining work
+# dci-agent and monitoring evidence
+
+```mermaid {scale: 0.57}
+%%{init: {"themeVariables": {"fontSize": "22px"}}}%%
+flowchart LR
+    M[Metrics · probes · logs<br/>Grafana monitoring] --> Q[IHEP MCP<br/>monitoring queries]
+    Q --> A[dci-agent<br/>correlate · analyze]
+    F[Read-only evidence<br/>configs · logs · source] --> A
+    H[Administrator<br/>or scheduled check] --> A
+    A --> R[Status checks<br/>and reports]
+```
+
+<div class="two-notes mt-4">
+  <div><strong>Across systems</strong><br/>Combine monitoring results with read-only evidence from DIRAC and related middleware to investigate a fault.</div>
+  <div><strong>Action boundary</strong><br/>Operational writes use separate, scoped MCP functions. Critical changes remain subject to administrator control.</div>
+</div>
+
+<!--
+Timing: 1:00
+
+Monitoring data are useful when they can be related to configurations, logs, and the middleware chain. The Hermes-based dci-agent uses IHEP MCP monitoring queries together with sanitized read-only evidence from systems such as DIRAC and FTS3. Administrators or scheduled checks can ask for cross-system status and reports. The read-only evidence path does not grant write access. If an operational action is permitted, it uses a separate, scoped MCP function; critical changes require administrator control. This is an operations assistant, not an automatic fault-repair system. The architecture and boundaries are described in the 12th DIRACx Workshop report.
+-->
+---
+layout: default
+---
+
+# Status and CEPC work
 
 <div class="cols mt-2">
   <div>
 
-## Available in the reference setup
+## Operating at IHEP
 
 <div class="status-stack tight">
-  <div><mdi-check-circle-outline /><span><strong>Dashboard files</strong><br/>31 JSON files in five provisioned folders</span></div>
-  <div><mdi-check-circle-outline /><span><strong>Active checks</strong><br/>SAM, TPC, certificate, and OIDC probes</span></div>
-  <div><mdi-check-circle-outline /><span><strong>Middleware logs</strong><br/>DIRAC records in Elasticsearch and Grafana</span></div>
-  <div><mdi-check-circle-outline /><span><strong>Host metrics</strong><br/>Prometheus exporters and service checks</span></div>
+  <div><mdi-check-circle-outline /><span><strong>Grafana</strong><br/>Multi-org dashboards, 31 provisioned JSON files, email and WeCom alerts</span></div>
+  <div><mdi-check-circle-outline /><span><strong>Active probing</strong><br/>SAM site-pair matrix, TPC, certificate, and OIDC checks</span></div>
+  <div><mdi-check-circle-outline /><span><strong>Metrics and logs</strong><br/>Host and service metrics; centralized DIRAC component records</span></div>
+  <div><mdi-check-circle-outline /><span><strong>dci-agent</strong><br/>Cross-system checks and reports with scoped action boundaries</span></div>
 </div>
 
   </div>
   <div>
 
-## To define or validate
+## Needed for CEPC
 
 <div class="status-stack next tight">
-  <div><mdi-arrow-right-circle-outline /><span><strong>Alert criteria</strong><br/>Thresholds, recipients, and response procedures</span></div>
-  <div><mdi-arrow-right-circle-outline /><span><strong>Service tests</strong><br/>CEPC sites, probe definitions, and test coverage</span></div>
-  <div><mdi-arrow-right-circle-outline /><span><strong>Log monitoring</strong><br/>Baselines, retention, and middleware compatibility</span></div>
-  <div><mdi-arrow-right-circle-outline /><span><strong>CEPC configuration</strong><br/>Target inventory, dashboards, and access rules</span></div>
+  <div><mdi-arrow-right-circle-outline /><span><strong>Site and service inventory</strong><br/>List endpoints, owners, and dashboard access</span></div>
+  <div><mdi-arrow-right-circle-outline /><span><strong>Probe coverage</strong><br/>Define CEPC site pairs, transfer protocols, and test cadence</span></div>
+  <div><mdi-arrow-right-circle-outline /><span><strong>Operational alerts</strong><br/>Set thresholds, recipients, and response procedures</span></div>
+  <div><mdi-arrow-right-circle-outline /><span><strong>Log policy</strong><br/>Check middleware ingestion, retention, and field mappings</span></div>
 </div>
 
   </div>
@@ -543,7 +537,7 @@ layout: default
 <!--
 Timing: 1:00
 
-The left column summarizes functions demonstrated in the IHEP DCI reference environment. The thirty-one dashboard files are counted from the provisioning repository; the SAM dashboard is a separate example from the Grafana instance. Filebeat is an optional ingestion method for other middleware and is not included here as a verified deployment count. The host and job counts on the previous slide were measured in September, so they should not be read as current capacity. The right column lists CEPC-specific definitions and validation, including tests, access rules, thresholds, and operational responsibilities.
+The left side is what is already in use at IHEP: Grafana for JUNO, HERD, and shared infrastructure; active tests, host metrics, centralized DIRAC logs, and dci-agent for cross-system investigation. The 31 files are the repository inventory, not all dashboards in the instance. Filebeat remains an optional pattern for other middleware. The right side is not a generic promise of reuse: CEPC must identify sites and service owners, decide which site pairs and transfer protocols to probe, set alert recipients and procedures, and validate log ingestion and retention. The historical host counts should not be read as current fleet size.
 -->
 ---
 layout: default
@@ -552,21 +546,21 @@ layout: default
 # Summary
 
 <div class="three-cards takeaway-cards mt-6">
-  <div class="story-card"><strong>1</strong><h2>Available tools</h2><p>Grafana displays host metrics, active probe results, and middleware logs in the reference setup.</p></div>
-  <div class="story-card"><strong>2</strong><h2>Configuration</h2><p>Provisioned dashboard definitions are maintained as JSON files in Git.</p></div>
-  <div class="story-card"><strong>3</strong><h2>CEPC work</h2><p>Site targets, probes, alert criteria, and permissions must be specified and tested.</p></div>
+  <div class="story-card"><strong>1</strong><h2>Measure paths</h2><p>Host health alone is insufficient; site-pair probes reveal transfer failures and network asymmetry.</p></div>
+  <div class="story-card"><strong>2</strong><h2>Relate evidence</h2><p>Metrics, probes, and middleware logs can be inspected together; dci-agent helps connect them during diagnosis.</p></div>
+  <div class="story-card"><strong>3</strong><h2>Adapt to CEPC</h2><p>Reuse the monitoring methods, but specify CEPC targets, thresholds, ownership, and access before deployment.</p></div>
 </div>
 
 <div class="closing-line mt-10">
-The IHEP DCI deployment provides a technical reference.<br/>
-CEPC monitoring requires its own <strong>requirements and validation</strong>.
+IHEP DCI provides a working reference.<br/>
+CEPC monitoring needs <strong>experiment-specific tests and operational ownership</strong>.
 </div>
 
 
 <!--
 Timing: 0:50
 
-To summarize: Grafana can display the host, active-probe, and middleware-log information already collected in the IHEP DCI environment. File provisioning makes the selected dashboard definitions easier to maintain and review. Before using this approach for CEPC, we must identify its sites and services, choose probes and thresholds, define access, and validate the monitoring chain against actual CEPC operations. This is an example architecture, not a claim that CEPC monitoring is already complete.
+Three conclusions. First, monitoring has to test inter-site paths as well as individual services: a source-to-destination matrix shows failures that a per-site uptime number misses. Second, metrics, active tests, and middleware logs are more useful together, and dci-agent can assist an operator in relating that evidence without treating an alert as an automatic diagnosis. Third, CEPC can reuse the architecture and dashboard-management methods, but must establish its own tests, access rules, thresholds, and responsibilities. The IHEP deployment is a reference, not a completed CEPC deployment.
 -->
 ---
 layout: cover
