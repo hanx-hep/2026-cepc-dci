@@ -471,6 +471,17 @@ Timing: 1:00
 The host metrics are collected by Prometheus from node exporters. The twenty-six hosts and ten job names shown here are a snapshot from September 2026, not a measurement of the current fleet. Jobs include machine metrics and checks for services such as ActiveMQ, MySQL, storage, authentication, and certificate expiry. The command-line tool on the monitoring server manages targets; it is not intended to run from this slide repository. CEPC would require its own target inventory and service coverage.
 -->
 ---
+layout: section
+---
+
+# 5 · Dr. DCI
+
+<!--
+Timing: 0:10
+
+Part five is Dr. DCI: how dci-agent uses monitoring evidence to assist operators with cross-system checks and diagnosis.
+-->
+---
 layout: default
 ---
 
