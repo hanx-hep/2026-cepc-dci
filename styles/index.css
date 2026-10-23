@@ -348,6 +348,109 @@
   color: var(--ctp-text);
 }
 
+.monitoring-map {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 1.3rem 6.4rem 1.3rem 7.5rem;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.monitoring-lanes {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.monitoring-lane {
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.55rem;
+  background: var(--ctp-surface0);
+}
+
+.lane-heading {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: var(--ctp-teal);
+  font-size: 0.95rem;
+}
+
+.lane-flow {
+  display: flex;
+  align-items: center;
+  gap: 0.28rem;
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  line-height: 1.25;
+}
+
+.lane-flow > span {
+  flex: none;
+  padding: 0.3rem 0.4rem;
+  border-radius: 0.3rem;
+  background: var(--ctp-base);
+}
+
+.lane-flow .store-node {
+  color: var(--ctp-blue);
+}
+
+.lane-flow > small,
+.lane-hint {
+  color: var(--ctp-subtext);
+  font-size: 0.68rem;
+  line-height: 1.25;
+}
+
+.lane-hint {
+  margin-top: 0.4rem;
+}
+
+.map-arrow {
+  color: var(--ctp-blue);
+  font-size: 1.6rem;
+  text-align: center;
+}
+
+.grafana-hub {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding: 1.1rem 0.4rem;
+  border-radius: 0.6rem;
+  background: rgba(137, 180, 250, 0.15);
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+.grafana-hub strong {
+  font-size: 1.1rem;
+}
+
+.grafana-hub small {
+  color: var(--ctp-subtext);
+  font-size: 0.68rem;
+}
+
+.monitoring-outputs {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.monitoring-outputs > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.7rem 0.4rem;
+  border-radius: 0.5rem;
+  background: var(--ctp-surface0);
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+.monitoring-outputs span {
+  color: var(--ctp-subtext);
+  font-size: 0.72rem;
+}
+
 .provider-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);

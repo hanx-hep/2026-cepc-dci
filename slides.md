@@ -80,39 +80,44 @@ layout: default
 
 # Monitoring architecture
 
-```mermaid {scale: 0.52}
-%%{init: {"themeVariables": {"fontSize": "20px"}}}%%
-flowchart LR
-    subgraph S[DCI sources]
-        H[26 Linux hosts<br/>node_exporter]
-        P[Active probes<br/>SAM · TPC · TLS · OIDC]
-        L[Middleware services<br/>DIRAC · FTS3 · others]
-    end
-
-    H --> PR[(Prometheus)]
-    P --> MQ[ActiveMQ<br/>buffer] --> LS[Logstash] --> ES[(Elasticsearch)]
-    L -->|DIRAC built-in mqLogs| MQ
-    L -->|other middleware| FB[Filebeat] --> ES
-
-    GIT[(Git · dashboards<br/>as JSON)] --> G[Grafana]
-    PR --> G
-    ES --> G
-    G --> O[Operators · web]
-    G --> A[MCP gateway · clients]
-    G --> N[Alerting<br/>Email · WeCom]
-```
+<div class="monitoring-map mt-3">
+  <div class="monitoring-lanes">
+    <div class="monitoring-lane">
+      <strong class="lane-heading">Middleware monitoring data</strong>
+      <div class="lane-flow"><span>DIRAC</span><b>→</b><span class="store-node">Elasticsearch</span><small>Direct output; ActiveMQ used as a buffer</small></div>
+      <div class="lane-flow"><span>FTS</span><b>→</b><span>ActiveMQ</span><b>→</b><span>monpipe</span><b>→</b><span class="store-node">Elasticsearch</span></div>
+      <div class="lane-hint">monpipe: a DCI Group service for monitoring-data transport</div>
+    </div>
+    <div class="monitoring-lane">
+      <strong class="lane-heading">Centralized service logs</strong>
+      <div class="lane-flow"><span>DIRAC logs</span><b>→</b><span>ActiveMQ</span><b>→</b><span>Logstash</span><b>→</b><span class="store-node">Elasticsearch</span></div>
+      <div class="lane-flow"><span>FTS / other logs</span><b>→</b><span>Filebeat</span><b>→</b><span class="store-node">Elasticsearch</span></div>
+    </div>
+    <div class="monitoring-lane">
+      <strong class="lane-heading">Infrastructure and active probes</strong>
+      <div class="lane-flow"><span>Host metrics</span><b>→</b><span class="store-node">Prometheus</span><small>SAM · TPC · TLS · OIDC: probe-result stores</small></div>
+      <div class="lane-flow"><span>Network · storage · other infra</span><b>→</b><span class="store-node">Other databases</span></div>
+    </div>
+  </div>
+  <div class="map-arrow">→</div>
+  <div class="grafana-hub"><strong>Grafana</strong><span>Multiple<br/>data sources</span><small>Dashboard JSON<br/>from Git</small></div>
+  <div class="map-arrow">→</div>
+  <div class="monitoring-outputs">
+    <div><strong>Operators</strong><span>Web interface</span></div>
+    <div><strong>MCP</strong><span>Gateway / clients</span></div>
+    <div><strong>Alerting</strong><span>Email · WeCom</span></div>
+  </div>
+</div>
 
 <div class="architecture-note mt-4">
 The existing IHEP DCI monitoring system supports JUNO and HERD and also monitors shared distributed-computing infrastructure.
 </div>
 
-<div class="text-center muted text-xs mt-2">Architecture shown schematically; the host count is a historical example.</div>
-
 
 <!--
 Timing: 1:05
 
-This schematic describes the existing IHEP DCI monitoring system, which supports JUNO and HERD as well as shared computing infrastructure. Host metrics go to Prometheus. Active probe results, including SAM, TPC, certificate, and OIDC checks, can pass through ActiveMQ and Logstash to Elasticsearch. DIRAC's built-in mqLogs backend also sends records through ActiveMQ and Logstash before Elasticsearch. Other middleware, such as FTS3, may use Filebeat to ship local log files. Grafana displays data to web operators and MCP clients and sends email and WeCom alerts. CEPC-specific alert rules and recipient lists would need to be defined separately.
+There are two different kinds of middleware output. Monitoring data describe the service's operation: DIRAC writes to Elasticsearch directly, with ActiveMQ used as a buffer; FTS monitoring data follow ActiveMQ, monpipe, and Elasticsearch. Monpipe is a DCI Group service for transporting monitoring data. Service log messages have a separate collection path: DIRAC logs go through ActiveMQ and Logstash to Elasticsearch, while FTS and other middleware logs use Filebeat. These logical paths do not imply separate physical ActiveMQ or Elasticsearch deployments. Grafana is not limited to Elasticsearch and Prometheus: it also queries databases for network, storage, and other infrastructure. Active probes contribute their own test-result data. The common interface serves web operators, MCP clients, and email and WeCom alerts. The system supports JUNO, HERD, and shared IHEP DCI infrastructure.
 -->
 ---
 layout: section
@@ -303,7 +308,7 @@ layout: default
 
 <div class="triage-list mt-4">
   <div><small>DIRAC</small><strong>Built-in mqLogs backend</strong><span>DIRAC services and agents send logs through ActiveMQ and Logstash into Elasticsearch.</span></div>
-  <div><small>OTHER MIDDLEWARE</small><strong>Filebeat when needed</strong><span>A log shipper can read local log files from components such as FTS3 and forward them for central indexing.</span></div>
+  <div><small>FTS AND OTHER MIDDLEWARE</small><strong>Filebeat collection</strong><span>Filebeat reads local service log files and forwards them to Elasticsearch for central indexing.</span></div>
 </div>
 
 <div class="takeaway compact mt-3">Common fields such as time, component, and severity support cross-service searches.</div>
@@ -318,7 +323,7 @@ layout: default
 flowchart TB
     A[DIRAC components] -->|built-in mqLogs| MQ[ActiveMQ]
     MQ --> LS[Logstash] --> E[(Elasticsearch)]
-    B[Other middleware<br/>log files] --> C[Filebeat] --> E
+    B[FTS and other middleware<br/>log files] --> C[Filebeat] --> E
     E --> D[Grafana<br/>log views]
 ```
 
@@ -329,7 +334,7 @@ flowchart TB
 <!--
 Timing: 1:00
 
-The JUNO DIRAC setup includes more than sixty services and agents across five servers. DIRAC's built-in mqLogs backend sends records to ActiveMQ, which buffers them before Logstash processes them into Elasticsearch. For other middleware, a shipper such as Filebeat can collect local log files instead; this is an available collection pattern, not a claim that all components already use Filebeat. Elasticsearch is the shared store, and Grafana provides the inspection interface. Field mappings and delivery should be validated per component and again when a middleware version changes.
+This slide concerns service logs, not the monitoring-data outputs shown separately in the architecture. DIRAC's built-in mqLogs backend sends records to ActiveMQ, which buffers them before Logstash processes them into Elasticsearch. FTS and other middleware logs use Filebeat to collect local log files for Elasticsearch. FTS monitoring data, by contrast, use monpipe rather than Logstash; DIRAC monitoring data can go directly to Elasticsearch. Grafana provides the log-inspection interface. Field mappings and delivery should be validated per component and again when a middleware version changes.
 -->
 ---
 layout: default
@@ -506,7 +511,7 @@ layout: default
 <!--
 Timing: 1:00
 
-The left side is what is already in use at IHEP: Grafana for JUNO, HERD, and shared infrastructure; active tests, host metrics, centralized DIRAC logs, and dci-agent for cross-system investigation. The 31 files are the repository inventory, not all dashboards in the instance. Filebeat remains an optional pattern for other middleware. The right side is not a generic promise of reuse: CEPC must identify sites and service owners, decide which site pairs and transfer protocols to probe, set alert recipients and procedures, and validate log ingestion and retention. The historical host counts should not be read as current fleet size.
+The left side is what is already in use at IHEP: Grafana for JUNO, HERD, and shared infrastructure; active tests, infrastructure databases, centralized middleware logs, and dci-agent for cross-system investigation. The 31 files are the repository inventory, not all dashboards in the instance. Service-monitoring data and service logs use distinct ingestion paths, including monpipe for FTS monitoring and Filebeat for FTS logs. CEPC must identify sites and service owners, decide which site pairs and transfer protocols to probe, set alert recipients and procedures, and validate log ingestion and retention. The historical host counts should not be read as current fleet size.
 -->
 ---
 layout: default
