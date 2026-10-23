@@ -80,26 +80,42 @@ layout: default
 
 # Monitoring architecture
 
-```mermaid {scale: 0.46}
+```mermaid {scale: 0.50}
 %%{init: {"themeVariables": {"fontSize": "20px"}, "flowchart": {"nodeSpacing": 16, "rankSpacing": 24, "padding": 10}}}%%
 flowchart LR
-    subgraph M[Middleware monitoring data]
-        D[DIRAC] -->|direct| ME[(Elasticsearch)]
-        D -. buffer .-> MB[ActiveMQ]
-        MB -.-> ME
-        F[FTS] --> MQ[ActiveMQ] --> MP[monpipe] --> ME
+    subgraph S[Data sources]
+        D[DIRAC monitoring]
+        F[FTS monitoring]
+        DL[DIRAC logs]
+        FL[FTS and other logs]
+        H[Host metrics]
+        N[Network · storage<br/>other infrastructure]
+        P[SAM · TPC<br/>TLS · OIDC]
     end
-    subgraph L[Centralized service logs]
-        DL[DIRAC logs] --> LM[ActiveMQ] --> LS[Logstash] --> LE[(Elasticsearch)]
-        FL[FTS and other logs] --> FB[Filebeat] --> LE
+    subgraph T[Collection and processing]
+        MQ[ActiveMQ<br/>shared buffer]
+        MP[monpipe]
+        LS[Logstash]
+        FB[Filebeat]
     end
-    subgraph I[Infrastructure and probes]
-        H[Host metrics] --> PR[(Prometheus)]
-        N[Network · storage<br/>other infrastructure] --> DB[(Other databases)]
-        P[SAM · TPC<br/>TLS · OIDC] --> PD[(Probe-result stores)]
+    subgraph B[Data stores]
+        ES[(Elasticsearch)]
+        PR[(Prometheus)]
+        DB[(Other databases)]
+        PD[(Probe-result stores)]
     end
-    ME --> G[Grafana]
-    LE --> G
+    D -->|direct| ES
+    D -. buffer .-> MQ
+    MQ -. buffered delivery .-> ES
+    F --> MQ
+    DL --> MQ
+    MQ -->|FTS monitoring| MP --> ES
+    MQ -->|DIRAC logs| LS --> ES
+    FL --> FB --> ES
+    H --> PR
+    N --> DB
+    P --> PD
+    ES --> G[Grafana]
     PR --> G
     DB --> G
     PD --> G
@@ -113,13 +129,13 @@ flowchart LR
 The existing IHEP DCI monitoring system supports JUNO and HERD and also monitors shared distributed-computing infrastructure.
 </div>
 
-<div class="text-center muted text-xs mt-2">monpipe: a DCI Group monitoring-data transport service · groups show logical paths, not separate physical deployments.</div>
+<div class="text-center muted text-xs mt-2">Shared ActiveMQ and Elasticsearch · monpipe: a DCI Group monitoring-data transport service.</div>
 
 
 <!--
 Timing: 1:05
 
-There are two different kinds of middleware output. Monitoring data describe the service's operation: DIRAC writes to Elasticsearch directly, with ActiveMQ used as a buffer; FTS monitoring data follow ActiveMQ, monpipe, and Elasticsearch. Monpipe is a DCI Group service for transporting monitoring data. Service log messages have a separate collection path: DIRAC logs go through ActiveMQ and Logstash to Elasticsearch, while FTS and other middleware logs use Filebeat. These logical paths do not imply separate physical ActiveMQ or Elasticsearch deployments. Grafana is not limited to Elasticsearch and Prometheus: it also queries databases for network, storage, and other infrastructure. Active probes contribute their own test-result data. The common interface serves web operators, MCP clients, and email and WeCom alerts. The system supports JUNO, HERD, and shared IHEP DCI infrastructure.
+There are two different kinds of middleware output, but one shared ActiveMQ and one shared Elasticsearch. Monitoring data describe the service's operation: DIRAC writes to Elasticsearch directly, with ActiveMQ used as a buffer; FTS monitoring data follow ActiveMQ, monpipe, and Elasticsearch. Monpipe is a DCI Group service for transporting monitoring data. Service log messages have a separate processing path: DIRAC logs go through the same ActiveMQ and then Logstash to Elasticsearch, while FTS and other middleware logs use Filebeat. The dashed route denotes buffered DIRAC monitoring delivery without specifying its consumer implementation. Grafana also queries Prometheus and databases for network, storage, other infrastructure, and active probe results. Its outputs serve web operators, MCP clients, and email and WeCom alerts. The system supports JUNO, HERD, and shared IHEP DCI infrastructure.
 -->
 ---
 layout: section
