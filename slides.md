@@ -105,8 +105,8 @@ flowchart LR
         PD[(Probe-result stores)]
     end
     D -->|direct| ES
-    D -. buffer .-> MQ
-    MQ -. buffered delivery .-> ES
+    D -. buffer on ES failure .-> MQ
+    MQ -. read after recovery .-> D
     F --> MQ
     DL --> MQ
     MQ -->|FTS monitoring| MP --> ES
@@ -135,7 +135,7 @@ The existing IHEP DCI monitoring system supports JUNO and HERD and also monitors
 <!--
 Timing: 1:05
 
-There are two different kinds of middleware output, but one shared ActiveMQ and one shared Elasticsearch. Monitoring data describe the service's operation: DIRAC writes to Elasticsearch directly, with ActiveMQ used as a buffer; FTS monitoring data follow ActiveMQ, monpipe, and Elasticsearch. Monpipe is a DCI Group service for transporting monitoring data. Service log messages have a separate processing path: DIRAC logs go through the same ActiveMQ and then Logstash to Elasticsearch, while FTS and other middleware logs use Filebeat. The dashed route denotes buffered DIRAC monitoring delivery without specifying its consumer implementation. Grafana also queries Prometheus and databases for network, storage, other infrastructure, and active probe results. Its outputs serve web operators, MCP clients, and email and WeCom alerts. The system supports JUNO, HERD, and shared IHEP DCI infrastructure.
+There are two different kinds of middleware output, but one shared ActiveMQ and one shared Elasticsearch. DIRAC monitoring writes directly to Elasticsearch. If that path stalls, DIRAC temporarily stores data in ActiveMQ. After recovery, DIRAC monitoring itself reads those buffered data and writes them along the original DIRAC-to-Elasticsearch path; there is no direct buffered-delivery path from ActiveMQ to Elasticsearch. FTS monitoring data follow ActiveMQ, monpipe, and Elasticsearch. Monpipe is a DCI Group service for transporting monitoring data. Service logs have a separate processing path: DIRAC logs go through the shared ActiveMQ and Logstash to Elasticsearch, while FTS and other middleware logs use Filebeat. Grafana also queries Prometheus and databases for network, storage, other infrastructure, and active probe results. Its outputs serve web operators, MCP clients, and email and WeCom alerts. The system supports JUNO, HERD, and shared IHEP DCI infrastructure.
 -->
 ---
 layout: section
