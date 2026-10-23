@@ -83,16 +83,16 @@ layout: default
 ```mermaid {scale: 0.50}
 %%{init: {"themeVariables": {"fontSize": "20px"}, "flowchart": {"nodeSpacing": 16, "rankSpacing": 24, "padding": 10}}}%%
 flowchart LR
-    subgraph S[Data sources]
-        D[DIRAC monitoring]
-        F[FTS monitoring]
-        DL[DIRAC logs]
-        FL[FTS and other logs]
-        H[Host metrics]
-        N[Network · storage<br/>other infrastructure]
-        P[SAM · TPC tests]
-        Q[TLS · OIDC checks]
+    subgraph S[DCI Source]
+        D["<div style='width:180px'>DIRAC monitoring</div>"]
+        F["<div style='width:180px'>FTS monitoring</div>"]
+        DL["<div style='width:180px'>DIRAC logs</div>"]
+        FL["<div style='width:180px'>FTS and other logs</div>"]
+        H["<div style='width:180px'>Host metrics</div>"]
+        P["<div style='width:180px'>SAM · TPC tests</div>"]
+        Q["<div style='width:180px'>TLS · OIDC checks</div>"]
     end
+    N[Network · storage<br/>other infrastructure]
     subgraph T[Collection and processing]
         MQ[ActiveMQ<br/>shared buffer]
         MP[monpipe]
@@ -105,8 +105,7 @@ flowchart LR
         DB[(Other databases)]
     end
     D -->|direct| ES
-    D -. buffer on ES failure .-> MQ
-    MQ -. read after recovery .-> D
+    D <-->|buffer / replay| MQ
     F --> MQ
     DL --> MQ
     MQ -->|FTS monitoring| MP --> ES
@@ -119,7 +118,8 @@ flowchart LR
     ES --> G[Grafana]
     PR --> G
     DB --> G
-    G -. provisioned from .-> J[Git · dashboard JSON]
+    G ~~~ J[Git · dashboard JSON]
+    J -. provisioning .-> G
     G --> O[Operators · web]
     G --> C[MCP gateway · clients]
     G --> A[Alerting<br/>Email · WeCom]
