@@ -90,7 +90,7 @@ flowchart LR
         FL["<div style='width:180px'>FTS and other logs</div>"]
         H["<div style='width:180px'>Host metrics</div>"]
         P["<div style='width:180px'>SAM · TPC tests</div>"]
-        Q["<div style='width:180px'>TLS · OIDC checks</div>"]
+        Q["<div style='width:180px'>Active probing<br/>Services · TLS · OIDC</div>"]
     end
     N[Network · storage<br/>other infrastructure]
     subgraph T[Collection and processing]
@@ -99,7 +99,7 @@ flowchart LR
         LS[Logstash]
         FB[Filebeat]
     end
-    subgraph B[Data stores]
+    subgraph B[Database]
         ES[(Elasticsearch)]
         PR[(Prometheus)]
         DB[(Other databases)]
@@ -108,8 +108,8 @@ flowchart LR
     D <-->|buffer / replay| MQ
     F --> MQ
     DL --> MQ
-    MQ -->|FTS monitoring| MP --> ES
-    MQ -->|DIRAC logs / SAM / TPC| LS --> ES
+    MQ --> MP --> ES
+    MQ -->|legacy SAM test| LS --> ES
     P --> MQ
     FL --> FB --> ES
     H --> PR
@@ -135,7 +135,7 @@ The existing IHEP DCI monitoring system supports JUNO and HERD and also monitors
 <!--
 Timing: 1:05
 
-There are two different kinds of middleware output, but one shared ActiveMQ and one shared Elasticsearch. DIRAC monitoring writes directly to Elasticsearch. If that path stalls, DIRAC temporarily stores data in ActiveMQ. After recovery, DIRAC monitoring itself reads those buffered data and writes them along the original DIRAC-to-Elasticsearch path; there is no direct buffered-delivery path from ActiveMQ to Elasticsearch. FTS monitoring data follow ActiveMQ, monpipe, and Elasticsearch. Monpipe is a DCI Group service for transporting monitoring data. DIRAC logs and SAM/TPC test results go through ActiveMQ and Logstash to Elasticsearch, while FTS and other middleware logs use Filebeat. TLS and OIDC checks use Prometheus, as do host metrics. Grafana also queries databases for network, storage, and other infrastructure; there is no separate probe-result database. The Git node on the right denotes configuration provenance, not a monitoring-data output. Grafana's outputs serve web operators, MCP clients, and email and WeCom alerts. The system supports JUNO, HERD, and shared IHEP DCI infrastructure.
+There are two different kinds of middleware output, but one shared ActiveMQ and one shared Elasticsearch. DIRAC monitoring writes directly to Elasticsearch. If that path stalls, DIRAC temporarily stores data in ActiveMQ. After recovery, DIRAC monitoring itself reads those buffered data and writes them along the original DIRAC-to-Elasticsearch path. Current MQ processing uses monpipe for FTS monitoring, DIRAC logs, and SAM/TPC results; only legacy SAM tests retain the Logstash path. Monpipe is a DCI Group service for transporting monitoring data. FTS and other middleware logs use Filebeat. Active service, TLS, and OIDC checks use Prometheus, as do host metrics. Grafana also queries databases for network, storage, and other infrastructure; there is no separate probe-result database. The Git node on the right denotes configuration provenance, not a monitoring-data output. The system supports JUNO, HERD, and shared IHEP DCI infrastructure.
 -->
 ---
 layout: section
@@ -255,21 +255,23 @@ Active probes test services from the outside. The next two slides cover the rang
 layout: default
 ---
 
-# Active service checks
+# Service checks and metrics
 
-<div class="probe-grid mt-6">
-  <div><strong>SAM site tests</strong><span>Service and storage checks from a client or another grid site; results form a source–destination matrix.</span></div>
+<div class="probe-grid expanded-probes mt-3">
+  <div><strong>SAM site tests</strong><span>Service and storage checks between grid sites; retain source and destination.</span></div>
   <div><strong>TPC tests</strong><span>Third-party copy checks exercise transfer paths between storage endpoints.</span></div>
-  <div><strong>Certificate checks</strong><span>Check TLS validity and remaining lifetime before expiry affects a service.</span></div>
+  <div><strong>DCI services</strong><span>Active checks test whether distributed-computing services respond as expected.</span></div>
+  <div><strong>TLS certificates</strong><span>Check validity and remaining lifetime before expiry affects a service.</span></div>
   <div><strong>OIDC checks</strong><span>Test the identity-service endpoints needed for authentication.</span></div>
+  <div><strong>Database metrics</strong><span>Track database activity and health alongside external service checks.</span></div>
 </div>
 
-<div class="takeaway mt-6">Active probing measures whether a service or transfer path works <strong>from a client’s point of view</strong>; host metrics alone cannot establish that.</div>
+<div class="takeaway compact mt-3">Active probes test service behavior <strong>from a client’s point of view</strong>; database and host metrics provide complementary internal measurements.</div>
 
 <!--
 Timing: 0:55
 
-Active probing is broader than SAM. We run checks for site services and inter-site transfers, including TPC. Certificate checks cover TLS expiry, and OIDC checks cover identity endpoints. These tests complement host metrics because a healthy server does not necessarily mean a remote client can authenticate, reach a service, or transfer data. The next slide shows SAM results alongside TPC site-pair matrices.
+Active probing is broader than SAM. We run checks for DCI services and inter-site transfers, including TPC. Certificate checks cover TLS expiry, and OIDC checks cover identity endpoints. Database metrics complement these external checks with measurements of database activity and health; they are not themselves all active probes. A healthy host or database does not necessarily mean a remote client can authenticate, reach a service, or transfer data. The next slide shows SAM results alongside TPC site-pair matrices.
 -->
 ---
 layout: default
@@ -325,7 +327,7 @@ layout: default
 ## Collection methods
 
 <div class="triage-list mt-4">
-  <div><small>DIRAC</small><strong>Built-in mqLogs backend</strong><span>DIRAC services and agents send logs through ActiveMQ and Logstash into Elasticsearch.</span></div>
+  <div><small>DIRAC</small><strong>Built-in mqLogs backend</strong><span>DIRAC services and agents send logs through ActiveMQ and monpipe into Elasticsearch.</span></div>
   <div><small>FTS AND OTHER MIDDLEWARE</small><strong>Filebeat collection</strong><span>Filebeat reads local service log files and forwards them to Elasticsearch for central indexing.</span></div>
 </div>
 
@@ -340,7 +342,7 @@ layout: default
 %%{init: {"themeVariables": {"fontSize": "20px"}}}%%
 flowchart TB
     A[DIRAC components] -->|built-in mqLogs| MQ[ActiveMQ]
-    MQ --> LS[Logstash] --> E[(Elasticsearch)]
+    MQ --> MP[monpipe] --> E[(Elasticsearch)]
     B[FTS and other middleware<br/>log files] --> C[Filebeat] --> E
     E --> D[Grafana<br/>log views]
 ```
@@ -352,7 +354,7 @@ flowchart TB
 <!--
 Timing: 1:00
 
-This slide concerns service logs, not the monitoring-data outputs shown separately in the architecture. DIRAC's built-in mqLogs backend sends records to ActiveMQ, which buffers them before Logstash processes them into Elasticsearch. FTS and other middleware logs use Filebeat to collect local log files for Elasticsearch. FTS monitoring data, by contrast, use monpipe rather than Logstash; DIRAC monitoring data can go directly to Elasticsearch. Grafana provides the log-inspection interface. Field mappings and delivery should be validated per component and again when a middleware version changes.
+This slide concerns service logs, not the monitoring-data outputs shown separately in the architecture. DIRAC's built-in mqLogs backend sends records to ActiveMQ, which buffers them before monpipe processes them into Elasticsearch. Current MQ processing uses monpipe; Logstash is retained only for legacy SAM tests. FTS and other middleware logs use Filebeat to collect local log files for Elasticsearch, while DIRAC monitoring data can go directly to Elasticsearch with its separate recovery buffer. Grafana provides the log-inspection interface. Field mappings and delivery should be validated per component and again when a middleware version changes.
 -->
 ---
 layout: default
