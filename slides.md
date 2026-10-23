@@ -80,38 +80,40 @@ layout: default
 
 # Monitoring architecture
 
-<div class="monitoring-map mt-3">
-  <div class="monitoring-lanes">
-    <div class="monitoring-lane">
-      <strong class="lane-heading">Middleware monitoring data</strong>
-      <div class="lane-flow"><span>DIRAC</span><b>→</b><span class="store-node">Elasticsearch</span><small>Direct output; ActiveMQ used as a buffer</small></div>
-      <div class="lane-flow"><span>FTS</span><b>→</b><span>ActiveMQ</span><b>→</b><span>monpipe</span><b>→</b><span class="store-node">Elasticsearch</span></div>
-      <div class="lane-hint">monpipe: a DCI Group service for monitoring-data transport</div>
-    </div>
-    <div class="monitoring-lane">
-      <strong class="lane-heading">Centralized service logs</strong>
-      <div class="lane-flow"><span>DIRAC logs</span><b>→</b><span>ActiveMQ</span><b>→</b><span>Logstash</span><b>→</b><span class="store-node">Elasticsearch</span></div>
-      <div class="lane-flow"><span>FTS / other logs</span><b>→</b><span>Filebeat</span><b>→</b><span class="store-node">Elasticsearch</span></div>
-    </div>
-    <div class="monitoring-lane">
-      <strong class="lane-heading">Infrastructure and active probes</strong>
-      <div class="lane-flow"><span>Host metrics</span><b>→</b><span class="store-node">Prometheus</span><small>SAM · TPC · TLS · OIDC: probe-result stores</small></div>
-      <div class="lane-flow"><span>Network · storage · other infra</span><b>→</b><span class="store-node">Other databases</span></div>
-    </div>
-  </div>
-  <div class="map-arrow">→</div>
-  <div class="grafana-hub"><strong>Grafana</strong><span>Multiple<br/>data sources</span><small>Dashboard JSON<br/>from Git</small></div>
-  <div class="map-arrow">→</div>
-  <div class="monitoring-outputs">
-    <div><strong>Operators</strong><span>Web interface</span></div>
-    <div><strong>MCP</strong><span>Gateway / clients</span></div>
-    <div><strong>Alerting</strong><span>Email · WeCom</span></div>
-  </div>
-</div>
+```mermaid {scale: 0.46}
+%%{init: {"themeVariables": {"fontSize": "20px"}, "flowchart": {"nodeSpacing": 16, "rankSpacing": 24, "padding": 10}}}%%
+flowchart LR
+    subgraph M[Middleware monitoring data]
+        D[DIRAC] -->|direct| ME[(Elasticsearch)]
+        D -. buffer .-> MB[ActiveMQ]
+        MB -.-> ME
+        F[FTS] --> MQ[ActiveMQ] --> MP[monpipe] --> ME
+    end
+    subgraph L[Centralized service logs]
+        DL[DIRAC logs] --> LM[ActiveMQ] --> LS[Logstash] --> LE[(Elasticsearch)]
+        FL[FTS and other logs] --> FB[Filebeat] --> LE
+    end
+    subgraph I[Infrastructure and probes]
+        H[Host metrics] --> PR[(Prometheus)]
+        N[Network · storage<br/>other infrastructure] --> DB[(Other databases)]
+        P[SAM · TPC<br/>TLS · OIDC] --> PD[(Probe-result stores)]
+    end
+    ME --> G[Grafana]
+    LE --> G
+    PR --> G
+    DB --> G
+    PD --> G
+    J[Git · dashboard JSON] --> G
+    G --> O[Operators · web]
+    G --> C[MCP gateway · clients]
+    G --> A[Alerting<br/>Email · WeCom]
+```
 
-<div class="architecture-note mt-4">
+<div class="architecture-note mt-2">
 The existing IHEP DCI monitoring system supports JUNO and HERD and also monitors shared distributed-computing infrastructure.
 </div>
+
+<div class="text-center muted text-xs mt-2">monpipe: a DCI Group monitoring-data transport service · groups show logical paths, not separate physical deployments.</div>
 
 
 <!--
