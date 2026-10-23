@@ -4,6 +4,7 @@ routerMode: hash
 theme: '@ktym4a/slidev-theme-ktym4a'
 lineNumbers: true
 fonts: false
+favicon: './cepc-icon.png'
 title: Monitoring for the Distributed Computing Infrastructure
 titleTemplate: '%s - Xiao Han'
 mermaid:
