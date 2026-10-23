@@ -146,14 +146,17 @@ layout: default
     <div class="feature-item"><strong>Access control</strong><span>Organization and dashboard permissions limit who can view or edit.</span></div>
     <div class="feature-item"><strong>Alerts</strong><span>Rules on monitored data can notify operators by email and WeCom.</span></div>
   </div>
-  <div class="portrait-video-slot"></div>
+  <div class="grafana-demo">
+    <video :src="'./grafana-demo-trimmed.mp4'" autoplay loop muted playsinline controls preload="metadata" aria-label="Grafana interface screen recording"></video>
+    <div class="grafana-demo-caption"><mdi-monitor-screenshot /> Grafana interface · 1.5× · no audio</div>
+  </div>
 </div>
 
 
 <!--
 Timing: 1:00
 
-Grafana is the common web interface for IHEP DCI monitoring. We use multiple organizations for JUNO, HERD, and grid middleware such as CA services. IHEP account login and permissions control access to dashboards and configuration. Grafana also evaluates alert rules and sends notifications through email and WeCom. The space on the right is reserved for a portrait-format recording of the interface; no video has been added yet.
+Grafana is the common web interface for IHEP DCI monitoring. We use multiple organizations for JUNO, HERD, and grid middleware such as CA services. IHEP account login and permissions control access to dashboards and configuration. Grafana also evaluates alert rules and sends notifications through email and WeCom. The recording on the right shows the interface at 1.5 times the original speed, without audio. It has been trimmed by five seconds at the start and ten seconds at the readable end.
 -->
 ---
 layout: default
