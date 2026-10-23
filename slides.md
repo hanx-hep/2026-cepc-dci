@@ -246,51 +246,37 @@ layout: default
 <!--
 Timing: 0:55
 
-Active probing is broader than SAM. We run checks for site services and inter-site transfers, including TPC. Certificate checks cover TLS expiry, and OIDC checks cover identity endpoints. These tests complement host metrics because a healthy server does not necessarily mean a remote client can authenticate, reach a service, or transfer data. The SAM matrix on the next slide is one detailed example of this approach.
+Active probing is broader than SAM. We run checks for site services and inter-site transfers, including TPC. Certificate checks cover TLS expiry, and OIDC checks cover identity endpoints. These tests complement host metrics because a healthy server does not necessarily mean a remote client can authenticate, reach a service, or transfer data. The next slide shows SAM results alongside TPC site-pair matrices.
 -->
 ---
 layout: default
 ---
 
-# SAM site-to-site matrix
+# SAM and TPC tests
 
-<div class="cols mt-2">
+<div class="probe-screenshots mt-3">
   <div>
-
-<div class="triage-list">
-  <div><small>SOURCE × DESTINATION</small><strong>Every site pair matters</strong><span>Tests run from each grid site to the other sites, not only against one central endpoint.</span></div>
-  <div><small>TRANSFER PROTOCOLS</small><strong>WebDAV and XRootD</strong><span>Success-rate matrices expose paths that fail in one direction or between particular sites.</span></div>
-  <div><small>FOLLOW-UP</small><strong>Timelines and records</strong><span>Inspect when failures started and which underlying probes produced them.</span></div>
-</div>
-
+    <h2>SAM test</h2>
+    <a href="./images/SAMtest.png" target="_blank" rel="noopener noreferrer"><img class="sam-snapshot" src="/images/SAMtest.png" alt="SAM site availability, state history, and probe records with source and destination sites" /></a>
+    <div class="snapshot-explanation mt-3">Availability and history summarize service checks; individual records retain the <strong>source and destination</strong> for follow-up.</div>
+    <div class="takeaway compact mt-3">A single site-availability value is not enough: routes and configurations can produce <strong>site-pair or direction-dependent failures</strong>.</div>
+    <a class="snapshot-link" href="https://dci-grafana.ihep.ac.cn/d/samtestv3/sam-test-v4?orgId=1" target="_blank" rel="noopener noreferrer"><mdi-open-in-new /> Open SAM dashboard · sign in if needed</a>
   </div>
   <div>
-
-<div class="dashboard-frame component-dashboard-frame">
-  <iframe
-    src="https://dci-grafana.ihep.ac.cn/d/samtestv3/sam-test-v4?orgId=1&from=1788912000000&to=1788998400000&timezone=browser&var-site=$__all&var-exclude_tests=$__all&kiosk"
-    scrolling="yes"
-    class="component-dashboard-iframe"
-  ></iframe>
-</div>
-
-<div class="text-center mt-2">
-  <a href="https://dci-grafana.ihep.ac.cn/d/samtestv3/sam-test-v4?orgId=1&from=1788912000000&to=1788998400000&timezone=browser&var-site=$__all" target="_blank" rel="noopener noreferrer"><mdi-open-in-new /> Open full dashboard · sign in if needed</a>
-  <div class="embed-hint">If the embed asks for login, use the link above.</div>
-</div>
-
+    <h2>TPC test</h2>
+    <a href="./images/TPC-matrix.png" target="_blank" rel="noopener noreferrer"><img class="tpc-snapshot" src="/images/TPC-matrix.png" alt="TPC source-destination matrices showing pull and push test results" /></a>
+    <div class="snapshot-explanation mt-2">Pull and push can differ for the same <strong>source × destination</strong> pair.</div>
+    <a class="snapshot-link" href="https://dci-grafana.ihep.ac.cn/d/tpc-transfer-monitoring?orgId=1" target="_blank" rel="noopener noreferrer"><mdi-open-in-new /> Open TPC dashboard · sign in if needed</a>
   </div>
 </div>
+
+<div class="snapshot-footnote">Provided screenshots · historical examples, not current availability · click either image for full resolution.</div>
 
 
 <!--
 Timing: 1:15
 
-SAM is a prominent part of active probing because distributed storage is not described adequately by a single availability value per site. Network paths, routes, and site configurations differ: a site may reach one partner but not another, and the reverse direction may behave differently. We therefore examine a source-by-destination site matrix. The iframe queries a fixed September 2026 window for this presentation; it is not a measurement of current availability. It may load slowly.
-
-[Demo: wait for the dashboard, then show the overview row and one mesh panel. If Grafana requires login, open the full dashboard in a new tab and sign in. Reload the slide once; if the cross-site iframe still cannot use the session, present from the full Grafana tab. Do not assume a successful iframe load means authenticated data are available.]
-
-The upper panels summarize the selected time window. The WebDAV and XRootD matrices are the central point: each cell represents a particular source and destination, so we can distinguish a site-wide failure from a path-specific or asymmetric problem. Timelines and raw probe records help confirm when and how a particular pair failed. Percentages must always be read together with the selected window and probe definition.
+The supplied screenshots show two complementary active tests. The SAM view on the left contains availability, state history, and records that identify source and destination sites. It is not itself a matrix panel. The TPC screenshot on the right explicitly shows source-destination matrices for pull and push, with different patterns of failures. Distributed storage cannot be described adequately by a single availability number per site: routes, direction, and endpoint configuration matter. These are historical examples, not current measurements, and no common time window is implied between the images. Click an image for full resolution or open its Grafana dashboard after signing in.
 -->
 ---
 layout: section
@@ -351,43 +337,24 @@ layout: default
 
 # Inspecting component logs
 
-<div class="cols mt-2">
-  <div>
+<a href="./images/logs.png" target="_blank" rel="noopener noreferrer"><img class="logs-snapshot mt-4" src="/images/logs.png" alt="Centralized DIRAC ERROR log counts over time for FileCatalog, ComponentMonitoring, and StorageElementProxy" /></a>
 
-<div class="triage-list">
-  <div><small>LOG LEVEL</small><strong>Message counts</strong><span>Compare the number of messages by severity level.</span></div>
-  <div><small>TIME</small><strong>Change in rate</strong><span>Select a period to examine a change in message frequency.</span></div>
-  <div><small>COMPONENT</small><strong>Individual messages</strong><span>Filter by category and name to inspect relevant records.</span></div>
+<div class="json-details mt-5">
+  <div><strong>Select severity</strong><br/>This example selects ERROR messages across all component categories and names.</div>
+  <div><strong>Compare components</strong><br/>The curves show different components; peaks identify time windows for investigation.</div>
+  <div><strong>Inspect records</strong><br/>Use the full dashboard to narrow the component and time range, then read individual messages.</div>
 </div>
 
-  </div>
-  <div>
-
-<div class="dashboard-frame component-dashboard-frame">
-  <iframe
-    src="https://dci-grafana.ihep.ac.cn/d/bfgu666p30xdsb/component-logs?orgId=1&from=now-70d&to=now-69d&timezone=browser&var-Category=$__all&var-Name=$__all&var-Level=$__all&kiosk"
-    scrolling="yes"
-    class="component-dashboard-iframe"
-  ></iframe>
-</div>
-
-<div class="text-center mt-2">
-  <a href="https://dci-grafana.ihep.ac.cn/d/bfgu666p30xdsb/component-logs?orgId=1&from=now-70d&to=now-69d&timezone=browser&var-Category=$__all&var-Name=$__all&var-Level=$__all" target="_blank" rel="noopener noreferrer"><mdi-open-in-new /> Open full dashboard · sign in if needed</a>
-  <div class="embed-hint">If the embed asks for login, use the link above.</div>
-</div>
-
-  </div>
+<div class="snapshot-footer mt-4">
+  <span>Provided screenshot · historical example · click image for full resolution.</span>
+  <a href="https://dci-grafana.ihep.ac.cn/d/bfgu666p30xdsb/component-logs?orgId=1" target="_blank" rel="noopener noreferrer"><mdi-open-in-new /> Open full dashboard · sign in if needed</a>
 </div>
 
 
 <!--
 Timing: 1:10
 
-This is the DIRAC Component Logs dashboard on the live instance, as an example of centralized middleware log inspection. Its relative URL requests a one-day window 69–70 days before the presentation, so data may vary by date.
-
-[Demo: wait for the dashboard, then scroll through the three panels. If Grafana requires login, open the full dashboard in a new tab and sign in. Reload the slide once; if the cross-site iframe still cannot use the session, present from the full Grafana tab.]
-
-This dashboard offers three views of DIRAC log data: counts by level, changes over time, and individual records. Filters for category, component name, and level help narrow the query. The time window in this example is relative and may need adjustment during the presentation. The next slide lists proposed improvements across middleware services; they are not part of the current log collection pipeline.
+This supplied screenshot is a historical example from the centralized DIRAC logs dashboard. The panel is filtered to ERROR across all categories and names. The legend identifies FileCatalog, ComponentMonitoring, and StorageElementProxy, while the peaks help select a period to inspect. Counts are not a diagnosis or a normalized error rate. The full dashboard provides the context for filtering and reading individual messages. The next slide lists proposed improvements; the screenshot does not imply that automated log alerts or diagnosis are already implemented.
 -->
 ---
 layout: default

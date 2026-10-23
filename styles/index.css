@@ -205,6 +205,54 @@
   font-size: 1rem;
 }
 
+.probe-screenshots {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 1.5rem;
+}
+
+.sam-snapshot,
+.tpc-snapshot,
+.logs-snapshot {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0.4rem;
+}
+
+.tpc-snapshot {
+  max-height: 260px;
+  width: auto;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.snapshot-explanation {
+  color: var(--ctp-subtext);
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
+.snapshot-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.snapshot-footnote {
+  margin-top: 0.7rem;
+  color: var(--ctp-subtext);
+  font-size: 0.7rem;
+}
+
+.snapshot-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--ctp-subtext);
+  font-size: 0.75rem;
+}
+
 .mermaid {
   display: flex;
   justify-content: center;
