@@ -381,33 +381,7 @@ layout: default
 <!--
 Timing: 1:10
 
-This supplied screenshot is a historical example from the centralized DIRAC logs dashboard. The panel is filtered to ERROR across all categories and names. The legend identifies FileCatalog, ComponentMonitoring, and StorageElementProxy, while the peaks help select a period to inspect. Counts are not a diagnosis or a normalized error rate. The full dashboard provides the context for filtering and reading individual messages. The next slide lists proposed improvements; the screenshot does not imply that automated log alerts or diagnosis are already implemented.
--->
----
-layout: default
----
-
-# Planned log-monitoring work
-
-<div class="two-notes mt-4">
-  <div><strong>Available</strong><br/>Central collection and a dashboard for filtering and inspecting component records.</div>
-  <div><strong>Not yet evaluated</strong><br/>Alert criteria, log retention periods, and links from service metrics to log records.</div>
-</div>
-
-<div class="status-stack next cols-2 mt-3">
-  <div><mdi-arrow-right-circle-outline /><span><strong>Repeated error messages</strong><br/>Evaluate grouping by component and message type.</span></div>
-  <div><mdi-arrow-right-circle-outline /><span><strong>Rate-based alerts</strong><br/>Establish baselines before setting component-specific thresholds.</span></div>
-  <div><mdi-arrow-right-circle-outline /><span><strong>Retention policy</strong><br/>Define storage periods and index lifecycle requirements.</span></div>
-  <div><mdi-arrow-right-circle-outline /><span><strong>Metrics and logs</strong><br/>Preserve component and time selections when moving between views.</span></div>
-</div>
-
-<div class="takeaway mt-4">Check log delivery and field mappings when changing <strong>middleware versions</strong> or collection methods.</div>
-
-
-<!--
-Timing: 1:10
-
-The current pipeline collects and stores logs and supports manual searches. Further work is needed before it can reliably drive alerts. We need to examine repeated messages, define baselines and thresholds by component, agree on retention periods, and preserve context when switching from a metric to log records. When middleware is upgraded or reconfigured, the chosen collector and parsed fields should be tested again. These are proposed tasks, not delivered functions.
+This supplied screenshot is a historical example from the centralized DIRAC logs dashboard. The panel is filtered to ERROR across all categories and names. The legend identifies FileCatalog, ComponentMonitoring, and StorageElementProxy, while the peaks help select a period to inspect. Counts are not a diagnosis or a normalized error rate. The full dashboard provides the context for filtering and reading individual messages. Proposed log improvements are summarized with the overall status near the end; the screenshot does not imply that automated log alerts or diagnosis are already implemented.
 -->
 ---
 layout: section
@@ -524,30 +498,28 @@ The left column adapts the four stages in the DIRACx report as L1 to L4, by anal
 layout: default
 ---
 
-# Status and <img class="cepc-inline" src="/images/cepc-logo-transparent.png" alt="CEPC" /> work
+# Status and further work
 
 <div class="cols mt-2">
   <div>
 
-## Operating at IHEP
+## Current status
 
 <div class="status-stack tight">
   <div><mdi-check-circle-outline /><span><strong>Grafana</strong><br/>Multi-org dashboards, 31 provisioned JSON files, email and WeCom alerts</span></div>
-  <div><mdi-check-circle-outline /><span><strong>Active probing</strong><br/>SAM site-pair matrix, TPC, certificate, and OIDC checks</span></div>
-  <div><mdi-check-circle-outline /><span><strong>Metrics and logs</strong><br/>Host and service metrics; centralized DIRAC component records</span></div>
-  <div><mdi-check-circle-outline /><span><strong>dci-agent</strong><br/>Cross-system checks and reports with scoped action boundaries</span></div>
+  <div><mdi-check-circle-outline /><span><strong>Service monitoring</strong><br/>SAM/TPC tests, service/TLS/OIDC checks, and infrastructure metrics</span></div>
+  <div><mdi-check-circle-outline /><span><strong>Centralized logs</strong><br/>Collection, indexing, filtering, and component-level inspection</span></div>
+  <div><mdi-check-circle-outline /><span><strong>Dr. DCI</strong><br/>Cross-system checks and reports with scoped action boundaries</span></div>
 </div>
 
   </div>
   <div>
 
-## Needed for <img class="cepc-inline" src="/images/cepc-logo-transparent.png" alt="CEPC" />
+## Further improvements
 
-<div class="status-stack next tight">
-  <div><mdi-arrow-right-circle-outline /><span><strong>Site and service inventory</strong><br/>List endpoints, owners, and dashboard access</span></div>
-  <div><mdi-arrow-right-circle-outline /><span><strong>Probe coverage</strong><br/>Define <img class="cepc-inline" src="/images/cepc-logo-transparent.png" alt="CEPC" /> site pairs, transfer protocols, and test cadence</span></div>
-  <div><mdi-arrow-right-circle-outline /><span><strong>Operational alerts</strong><br/>Set thresholds, recipients, and response procedures</span></div>
-  <div><mdi-arrow-right-circle-outline /><span><strong>Log policy</strong><br/>Check middleware ingestion, retention, and field mappings</span></div>
+<div class="status-stack next">
+  <div><mdi-arrow-right-circle-outline /><span><strong>Log analysis and alerts</strong><br/>Group repeated errors and evaluate rate-based alerts against component baselines.</span></div>
+  <div><mdi-arrow-right-circle-outline /><span><strong>Retention and investigation context</strong><br/>Define index lifecycles and preserve component/time selections between metrics and logs.</span></div>
 </div>
 
   </div>
@@ -557,7 +529,7 @@ layout: default
 <!--
 Timing: 1:00
 
-The left side is what is already in use at IHEP: Grafana for JUNO, HERD, and shared infrastructure; active tests, infrastructure databases, centralized middleware logs, and dci-agent for cross-system investigation. The 31 files are the repository inventory, not all dashboards in the instance. Service-monitoring data and service logs use distinct ingestion paths, including monpipe for FTS monitoring and Filebeat for FTS logs. CEPC must identify sites and service owners, decide which site pairs and transfer protocols to probe, set alert recipients and procedures, and validate log ingestion and retention. The historical host counts should not be read as current fleet size.
+The current system supports JUNO, HERD, and shared IHEP infrastructure: multi-organization Grafana dashboards and notifications, active checks, infrastructure metrics, central log search, and Dr. DCI for cross-system checks and reporting. The 31 files are the provisioning repository inventory, not all dashboards in the instance. Further work is concentrated in two areas rather than a general onboarding checklist: evaluate repeated-error grouping and rate-based log alerts, and define retention while preserving component and time context between metrics and logs. These are proposed improvements, not delivered log-analysis functions. Delivery and field mappings should also be checked when middleware versions or collection methods change.
 -->
 ---
 layout: default
