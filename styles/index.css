@@ -775,6 +775,14 @@
   align-items: start;
 }
 
+.dr-workshop-link {
+  position: absolute;
+  top: 2.2rem;
+  right: 2.5rem;
+  font-size: 0.8rem;
+  color: var(--ctp-blue);
+}
+
 .dr-levels {
   display: grid;
   gap: 0.6rem;

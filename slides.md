@@ -461,6 +461,8 @@ layout: default
 
 # Dr. DCI architecture
 
+<a class="dr-workshop-link" href="https://hanx-hep.github.io/12th-diracx-workshop/" target="_blank" rel="noopener noreferrer"><mdi-open-in-new /> DIRACx Workshop report</a>
+
 <div class="dr-dci-layout mt-4">
   <div class="dr-levels">
     <div><strong>L1 · Analyzes</strong><span>Read-only checks and diagnosis; humans decide.</span></div>
