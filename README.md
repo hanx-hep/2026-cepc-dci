@@ -4,7 +4,7 @@ Build locally with `npm ci && npm run build`; the GitHub Pages workflow builds w
 
 The tab icon is `public/cepc-icon.png` (transparent, 256×256). Its full-size transparent logo is `public/images/cepc-logo-transparent.png`, sourced from the [CEPC official website](http://cepc.ihep.ac.cn/images/CEPClogo.png). The official PNG already contains transparency; the export preserves its white lettering, trims transparent margins, and pads the icon to a square.
 
-The cover uses the original dark, text-free IHEP symbol at top left and CEPC at top right, at equal height with their aspect ratios preserved. `public/images/ihep-symbol-transparent.png` is extracted from the symbol region of the [official IHEP header](https://english.ihep.cas.cn/images/logo-ihep.png), with the white matte removed; no color inversion is applied.
+The cover uses CEPC at top left and the original dark, text-free IHEP symbol at top right, at equal height with their aspect ratios preserved. `public/images/ihep-symbol-transparent.png` is extracted from the symbol region of the [official IHEP header](https://english.ihep.cas.cn/images/logo-ihep.png), with the white matte removed; no color inversion is applied.
 
 ## Grafana during a presentation
 
