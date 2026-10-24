@@ -260,7 +260,7 @@ layout: default
 # Service checks and metrics
 
 <div class="probe-grid expanded-probes mt-3">
-  <div><strong>SAM site tests</strong><span>Service and storage checks between grid sites; retain source and destination.</span></div>
+  <div><strong>SAM test</strong><span>Service and storage checks between grid sites; retain source and destination.</span></div>
   <div><strong>TPC tests</strong><span>Third-party copy checks exercise transfer paths between storage endpoints.</span></div>
   <div><strong>DCI services</strong><span>Active checks test whether distributed-computing services respond as expected.</span></div>
   <div><strong>TLS certificates</strong><span>Check validity and remaining lifetime before expiry affects a service.</span></div>
@@ -498,7 +498,7 @@ The left column adapts the four stages in the DIRACx report as L1 to L4, by anal
 layout: default
 ---
 
-# Status and further work
+# Status and <img class="cepc-inline" src="/images/cepc-logo-transparent.png" alt="CEPC" /> work
 
 <div class="cols mt-2">
   <div>
@@ -519,7 +519,7 @@ layout: default
 
 <div class="status-stack next">
   <div><mdi-arrow-right-circle-outline /><span><strong>Log analysis and alerts</strong><br/>Group repeated errors and evaluate rate-based alerts against component baselines.</span></div>
-  <div><mdi-arrow-right-circle-outline /><span><strong>Retention and investigation context</strong><br/>Define index lifecycles and preserve component/time selections between metrics and logs.</span></div>
+  <div><mdi-arrow-right-circle-outline /><span><strong><img class="cepc-inline" src="/images/cepc-logo-transparent.png" alt="CEPC" /> integration</strong><br/>Add experiment sites and services to the existing monitoring system; configure dashboards, access, and alerts.</span></div>
 </div>
 
   </div>
@@ -529,7 +529,7 @@ layout: default
 <!--
 Timing: 1:00
 
-The current system supports JUNO, HERD, and shared IHEP infrastructure: multi-organization Grafana dashboards and notifications, active checks, infrastructure metrics, central log search, and Dr. DCI for cross-system checks and reporting. The 31 files are the provisioning repository inventory, not all dashboards in the instance. Further work is concentrated in two areas rather than a general onboarding checklist: evaluate repeated-error grouping and rate-based log alerts, and define retention while preserving component and time context between metrics and logs. These are proposed improvements, not delivered log-analysis functions. Delivery and field mappings should also be checked when middleware versions or collection methods change.
+The current system supports JUNO, HERD, and shared IHEP infrastructure: multi-organization Grafana dashboards and notifications, active checks, infrastructure metrics, central log search, and Dr. DCI for cross-system checks and reporting. The 31 files are the provisioning repository inventory, not all dashboards in the instance. The next work is to evaluate repeated-error grouping and rate-based log alerts, and to integrate CEPC sites and services into the existing system with appropriate dashboards, access, and alerts. These are planned tasks, not a claim that CEPC integration or automated log analysis has already been completed.
 -->
 ---
 layout: default
