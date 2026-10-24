@@ -519,7 +519,7 @@ layout: default
 
 ## Further improvements
 
-<div class="status-stack next">
+<div class="status-stack next tight">
   <div><mdi-arrow-right-circle-outline /><span><strong>Log analysis and alerts</strong><br/>Group repeated errors and evaluate rate-based alerts against component baselines.</span></div>
   <div><mdi-arrow-right-circle-outline /><span><strong><img class="cepc-inline" src="/images/cepc-logo-transparent.png" alt="CEPC" /> integration</strong><br/>Add experiment sites and services to the existing monitoring system; configure dashboards, access, and alerts.</span></div>
 </div>
