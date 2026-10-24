@@ -40,15 +40,11 @@
 }
 
 .cover-cepc-logo {
-  left: 1.1rem;
-}
-
-.cover-ihep-logo {
   right: 1.1rem;
 }
 
-.cover-ihep-logo img {
-  filter: brightness(0) invert(1);
+.cover-ihep-logo {
+  left: 1.1rem;
 }
 
 .slidev-layout.section h1 {
