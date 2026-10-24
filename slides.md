@@ -485,27 +485,40 @@ Part five is Dr. DCI: how dci-agent uses monitoring evidence to assist operators
 layout: default
 ---
 
-# dci-agent and monitoring evidence
+# Dr. DCI architecture
 
-```mermaid {scale: 0.57}
-%%{init: {"themeVariables": {"fontSize": "22px"}}}%%
-flowchart LR
-    M[Metrics · probes · logs<br/>Grafana monitoring] --> Q[IHEP MCP<br/>monitoring queries]
-    Q --> A[dci-agent<br/>correlate · analyze]
-    F[Read-only evidence<br/>configs · logs · source] --> A
-    H[Administrator<br/>or scheduled check] --> A
-    A --> R[Status checks<br/>and reports]
-```
-
-<div class="two-notes mt-4">
-  <div><strong>Across systems</strong><br/>Combine monitoring results with read-only evidence from DIRAC and related middleware to investigate a fault.</div>
-  <div><strong>Action boundary</strong><br/>Operational writes use separate, scoped MCP functions. Critical changes remain subject to administrator control.</div>
+<div class="dr-dci-layout mt-4">
+  <div class="dr-levels">
+    <div><strong>L1 · Analyzes</strong><span>Read-only checks and diagnosis; humans decide.</span></div>
+    <div><strong>L2 · Assists</strong><span>Routine, reversible operational actions.</span></div>
+    <div><strong>L3 · Approved</strong><span>Critical actions only with administrator consent.</span></div>
+    <div><strong>L4 · Autonomous</strong><span>Full automation: a future goal, not current capability.</span></div>
+    <small>Autonomy stages, by analogy with automated driving.</small>
+  </div>
+  <div class="dr-architecture">
+    <div class="dr-source"><strong>READ-ONLY NFS</strong><span>configs · logs · source code · credentials sanitized</span></div>
+    <div class="dr-systems"><span>DIRAC</span><span>IHEPDIRAC</span><span>FTS3</span><span>grid-data</span><span>ihep-T1-ce</span></div>
+    <div class="dr-down"><span>read-only evidence</span><i aria-hidden="true"></i></div>
+    <div class="dr-flow">
+      <div class="dr-node"><small>MCP</small><strong>IHEP MCP</strong><span>monitoring · server control</span></div>
+      <b aria-hidden="true">→</b>
+      <div class="dr-node dr-agent"><small>HERMES-BASED</small><strong>dci-agent</strong><span>correlate · analyze · report</span></div>
+      <b aria-hidden="true">→</b>
+      <div class="dr-node"><small>OUTPUT</small><strong>Status reports</strong><span>checks &amp; findings</span></div>
+    </div>
+    <div class="dr-triggers">
+      <div class="dr-chat"><i aria-hidden="true"></i><strong>Feishu · Mattermost · WeCom · WebUI</strong><span>administrator chat</span></div>
+      <div class="dr-schedule"><strong>cronjob</strong> → scheduled checks</div>
+    </div>
+  </div>
 </div>
 
-<!--
-Timing: 1:00
+<div class="takeaway compact mt-3"><strong>Read-only evidence</strong>; operational writes use separate, scoped MCP functions.</div>
 
-Monitoring data are useful when they can be related to configurations, logs, and the middleware chain. The Hermes-based dci-agent uses IHEP MCP monitoring queries together with sanitized read-only evidence from systems such as DIRAC and FTS3. Administrators or scheduled checks can ask for cross-system status and reports. The read-only evidence path does not grant write access. If an operational action is permitted, it uses a separate, scoped MCP function; critical changes require administrator control. This is an operations assistant, not an automatic fault-repair system. The architecture and boundaries are described in the 12th DIRACx Workshop report.
+<!--
+Timing: 1:15
+
+The left column adapts the four stages in the DIRACx report as L1 to L4, by analogy with automated driving: read-only analysis, routine reversible assistance, critical actions with administrator approval, and full automation as a future goal. These are our descriptive stages, not a formal certification. The right-hand architecture follows slide 6 of that report. Sanitized read-only NFS evidence from DIRAC, IHEPDIRAC, FTS3, grid-data, and ihep-T1-ce feeds the Hermes-based dci-agent. IHEP MCP provides monitoring queries and separately scoped server-control functions. Administrators reach the assistant via Feishu, Mattermost, WeCom, or WebUI; cron jobs trigger scheduled checks. The output is checks and reports. Operational writes never go back through the evidence mounts, and learning alone does not grant additional permissions.
 -->
 ---
 layout: default
