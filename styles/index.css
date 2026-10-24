@@ -747,6 +747,27 @@
   color: var(--ctp-text);
 }
 
+.report-summary {
+  padding-left: 1.4rem;
+  font-size: 1.15rem;
+  line-height: 1.45;
+  color: var(--ctp-text);
+}
+
+.report-summary li {
+  list-style: disc;
+  margin-bottom: 0.9rem;
+}
+
+.summary-ready {
+  padding: 0.8rem 1rem;
+  border-left: 4px solid var(--ctp-blue);
+  background: rgba(137, 180, 250, 0.1);
+  color: var(--ctp-text);
+  font-size: 1.2rem;
+  line-height: 1.4;
+}
+
 .dr-dci-layout {
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(0, 8fr);

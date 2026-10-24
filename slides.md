@@ -537,22 +537,22 @@ layout: default
 
 # Summary
 
-<div class="three-cards takeaway-cards mt-6">
-  <div class="story-card"><strong>1</strong><h2>Measure paths</h2><p>Host health alone is insufficient; site-pair probes reveal transfer failures and network asymmetry.</p></div>
-  <div class="story-card"><strong>2</strong><h2>Relate evidence</h2><p>Metrics, probes, and middleware logs can be inspected together; dci-agent helps connect them during diagnosis.</p></div>
-  <div class="story-card"><strong>3</strong><h2>Adapt to <img class="cepc-inline" src="/images/cepc-logo-transparent.png" alt="CEPC" /></h2><p>Reuse the monitoring methods, but specify <img class="cepc-inline" src="/images/cepc-logo-transparent.png" alt="CEPC" /> targets, thresholds, ownership, and access before deployment.</p></div>
-</div>
+<ul class="report-summary mt-6">
+  <li>IHEP DCI monitoring serves JUNO, HERD, and shared computing infrastructure through Grafana.</li>
+  <li>Monitoring includes SAM/TPC site-pair tests, service checks, infrastructure metrics, and centralized middleware logs.</li>
+  <li>Dashboard JSON files are maintained in Git. Grafana supports IHEP login, access control, and email / WeCom alerts.</li>
+  <li>Dr. DCI uses monitoring data and read-only system information to assist with checks, diagnosis, and reporting.</li>
+</ul>
 
-<div class="closing-line mt-10">
-IHEP DCI provides a working reference.<br/>
-<img class="cepc-inline" src="/images/cepc-logo-transparent.png" alt="CEPC" /> monitoring needs <strong>experiment-specific tests and operational ownership</strong>.
+<div class="summary-ready mt-8">
+We are ready to deploy and configure DCI monitoring for <img class="cepc-inline" src="/images/cepc-logo-transparent.png" alt="CEPC" /> whenever needed.
 </div>
 
 
 <!--
 Timing: 0:50
 
-Three conclusions. First, monitoring has to test inter-site paths as well as individual services: a source-to-destination matrix shows failures that a per-site uptime number misses. Second, metrics, active tests, and middleware logs are more useful together, and dci-agent can assist an operator in relating that evidence without treating an alert as an automatic diagnosis. Third, CEPC can reuse the architecture and dashboard-management methods, but must establish its own tests, access rules, thresholds, and responsibilities. The IHEP deployment is a reference, not a completed CEPC deployment.
+To summarize, the IHEP DCI monitoring system already serves JUNO, HERD, and shared infrastructure. It covers site-pair tests, service checks, host and database metrics, and centralized middleware logs. Grafana provides access control and notifications, while selected dashboards are maintained as JSON in Git. Dr. DCI assists operators with checks and diagnosis using monitoring results and read-only system information. We are ready to deploy and configure DCI monitoring for CEPC whenever it is needed. This is readiness to deploy and configure, not a claim that CEPC-specific monitoring is already deployed.
 -->
 ---
 layout: cover
